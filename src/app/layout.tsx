@@ -1,16 +1,55 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import './globals.css';
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3007';
+
 export const metadata: Metadata = {
-  title: 'سطر — الخبر زبدة',
-  description: 'صحيفة إلكترونية ذكية تقدم كل خبر في 3 أسطر فقط. لا حشو، لا قشور.',
-  keywords: ['أخبار', 'سطر', 'صحيفة', 'السعودية', 'موجز'],
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: 'سطر — الخبر زبدة',
+    template: '%s — سطر',
+  },
+  description: 'صحيفة إلكترونية ذكية تقدم كل خبر في 3 أسطر فقط: الحدث، السياق، المعنى. لا حشو، لا قشور.',
+  keywords: ['أخبار', 'سطر', 'صحيفة', 'السعودية', 'موجز', 'أخبار مختصرة', 'ذكاء اصطناعي', 'إعلام'],
+  authors: [{ name: 'سطر' }],
+  creator: 'سطر',
+  publisher: 'سطر',
+  alternates: {
+    canonical: '/',
+    types: {
+      'application/rss+xml': '/feed.xml',
+    },
+  },
   openGraph: {
     title: 'سطر — الخبر زبدة',
     description: 'كل خبر في 3 أسطر فقط.',
+    url: SITE_URL,
+    siteName: 'سطر',
     type: 'website',
     locale: 'ar_SA',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'سطر — الخبر زبدة',
+    description: 'كل خبر في 3 أسطر فقط.',
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+    },
+  },
+  icons: {
+    icon: [{ url: '/favicon.svg', type: 'image/svg+xml' }],
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: '#1a3a5e',
+  width: 'device-width',
+  initialScale: 1,
 };
 
 export default function RootLayout({
@@ -21,6 +60,8 @@ export default function RootLayout({
   return (
     <html lang="ar" dir="rtl">
       <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
           href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap"
           rel="stylesheet"

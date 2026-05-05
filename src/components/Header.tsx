@@ -1,37 +1,73 @@
 import Link from 'next/link';
 import Logo from './Logo';
-import { Search, Bookmark, User } from 'lucide-react';
+import { Layers, User, LogOut, Search, Bookmark } from 'lucide-react';
 import { CATEGORY_LABELS } from '@/lib/utils';
+import { isAuthenticated } from '@/lib/auth';
+import LogoutButton from './LogoutButton';
 
-export default function Header() {
+export default async function Header() {
+  const authed = await isAuthenticated();
+
   return (
     <header className="sticky top-0 z-50 bg-[var(--paper)]/85 backdrop-blur-md border-b border-[var(--border)]">
       <div className="max-w-7xl mx-auto px-4 lg:px-6">
         <div className="flex items-center justify-between h-16">
-          {/* الشعار */}
           <Logo size="md" />
 
-          {/* أيقونات الجانب */}
-          <div className="flex items-center gap-2">
-            <button
-              className="p-2 hover:bg-[var(--accent-light)] rounded-full transition-colors"
-              aria-label="بحث"
-            >
-              <Search className="w-5 h-5 text-[var(--ink-soft)]" />
-            </button>
-            <button
-              className="p-2 hover:bg-[var(--accent-light)] rounded-full transition-colors"
-              aria-label="المحفوظات"
-            >
-              <Bookmark className="w-5 h-5 text-[var(--ink-soft)]" />
-            </button>
+          <div className="flex items-center gap-1.5">
             <Link
-              href="/admin"
-              className="hidden md:inline-flex items-center gap-2 px-4 py-2 bg-[var(--accent)] text-white rounded-full text-sm font-semibold hover:bg-[var(--accent-soft)] transition-colors"
+              href="/stack"
+              className="hidden sm:inline-flex items-center gap-2 px-3.5 py-2 bg-[var(--accent-light)] text-[var(--accent)] rounded-full text-sm font-bold hover:bg-[var(--accent)] hover:text-white transition-all"
+              title="عرض الكومة - مثالي للموبايل"
             >
-              <User className="w-4 h-4" />
-              لوحة التحرير
+              <Layers className="w-4 h-4" />
+              كومة
             </Link>
+            <Link
+              href="/stack"
+              className="sm:hidden p-2.5 bg-[var(--accent-light)] text-[var(--accent)] rounded-full hover:bg-[var(--accent)] hover:text-white transition-all"
+              title="عرض الكومة"
+              aria-label="عرض الكومة"
+            >
+              <Layers className="w-4 h-4" />
+            </Link>
+
+            <button
+              className="p-2 hover:bg-[var(--accent-light)] rounded-full transition-colors text-[var(--ink-soft)] hidden sm:inline-flex"
+              aria-label="بحث"
+              title="بحث (قريباً)"
+              disabled
+            >
+              <Search className="w-5 h-5" />
+            </button>
+
+            {authed ? (
+              <div className="flex items-center gap-1">
+                <Link
+                  href="/admin"
+                  className="hidden md:inline-flex items-center gap-2 px-4 py-2 bg-[var(--accent)] text-white rounded-full text-sm font-semibold hover:bg-[var(--accent-soft)] transition-colors"
+                >
+                  <User className="w-4 h-4" />
+                  لوحة التحرير
+                </Link>
+                <Link
+                  href="/admin"
+                  className="md:hidden p-2 bg-[var(--accent)] text-white rounded-full hover:bg-[var(--accent-soft)] transition-colors"
+                  aria-label="لوحة التحرير"
+                >
+                  <User className="w-4 h-4" />
+                </Link>
+                <LogoutButton />
+              </div>
+            ) : (
+              <Link
+                href="/admin/login"
+                className="hidden md:inline-flex items-center gap-2 px-4 py-2 border border-[var(--border)] rounded-full text-sm font-semibold text-[var(--ink-soft)] hover:border-[var(--accent)] hover:text-[var(--accent)] transition-colors"
+              >
+                <User className="w-4 h-4" />
+                دخول المحررين
+              </Link>
+            )}
           </div>
         </div>
 
