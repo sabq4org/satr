@@ -1,112 +1,135 @@
-// طبقة AI تشتغل أوفلاين بـ mock لما USE_AI_MOCK=true
+// طبقة AI متعددة المحركات
+// الأولوية: Ollama (محلي) → OpenAI (سحابي) → Mock (احتياطي)
 
-const USE_MOCK = process.env.USE_AI_MOCK === 'true' || !process.env.OPENAI_API_KEY;
+type Engine = 'ollama' | 'openai' | 'mock';
+
+function pickEngine(): Engine {
+  const forced = process.env.AI_ENGINE as Engine | undefined;
+  if (forced && ['ollama', 'openai', 'mock'].includes(forced)) return forced;
+
+  if (process.env.USE_AI_MOCK === 'true') return 'mock';
+  if (process.env.OLLAMA_URL || process.env.OLLAMA_MODEL) return 'ollama';
+  if (process.env.OPENAI_API_KEY) return 'openai';
+  return 'mock';
+}
+
+const ENGINE = pickEngine();
+const OLLAMA_URL = process.env.OLLAMA_URL || 'http://localhost:11434';
+const OLLAMA_MODEL = process.env.OLLAMA_MODEL || 'qwen2.5-coder:14b';
 
 export type ThreeLines = {
-  line1: string; // الحدث
-  line2: string; // السياق
-  line3: string; // المعنى
+  line1: string;
+  line2: string;
+  line3: string;
 };
 
 export type AIDeepenResult = {
   paragraphs: string[];
 };
 
-// تلخيص خبر طويل لـ 3 أسطر
+// ============= المنطق العام =============
+
 export async function summarizeToThreeLines(rawText: string, hint?: string): Promise<ThreeLines> {
-  if (USE_MOCK) {
-    return mockSummarize(rawText, hint);
-  }
-
-  const { OpenAI } = await import('openai');
-  const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-
-  const prompt = `أنت محرر أخبار محترف في صحيفة "سطر". مهمتك تلخيص الخبر التالي في 3 أسطر فقط:
+  const prompt = `أنت محرر أخبار محترف في صحيفة "سطر". لخّص الخبر التالي في 3 أسطر فقط:
 - السطر 1 (15-20 كلمة): الحدث - ماذا حدث، من، أين، متى
 - السطر 2 (15-20 كلمة): السياق - لماذا الآن، خلفية، رابط بأحداث سابقة
 - السطر 3 (10-15 كلمة): المعنى - التأثير، الدلالة، ماذا يعني للقارئ
 
-أعد JSON فقط بهذا الشكل: {"line1":"...","line2":"...","line3":"..."}
+أعد JSON فقط بهذا الشكل (بدون أي شرح): {"line1":"...","line2":"...","line3":"..."}
 
 الخبر:
-${rawText}
+${rawText}${hint ? `\n\nملاحظة: ${hint}` : ''}`;
 
-${hint ? `\nملاحظة: ${hint}` : ''}`;
-
-  const res = await client.chat.completions.create({
-    model: 'gpt-4o',
-    messages: [{ role: 'user', content: prompt }],
-    response_format: { type: 'json_object' },
-    temperature: 0.5,
-  });
-
-  const content = res.choices[0]?.message?.content || '{}';
-  return JSON.parse(content) as ThreeLines;
+  if (ENGINE === 'mock') return mockSummarize(rawText);
+  if (ENGINE === 'ollama') return await ollamaJSON<ThreeLines>(prompt);
+  return await openaiJSON<ThreeLines>(prompt);
 }
 
-// AI Deepen — توسيع الخبر لفقرتين
-export async function deepenArticle(threeLines: ThreeLines): Promise<AIDeepenResult> {
-  if (USE_MOCK) {
-    return mockDeepen(threeLines);
-  }
-
-  const { OpenAI } = await import('openai');
-  const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-
+export async function deepenArticle(t: ThreeLines): Promise<AIDeepenResult> {
   const prompt = `لديك خبر مختصر في 3 أسطر:
-1. ${threeLines.line1}
-2. ${threeLines.line2}
-3. ${threeLines.line3}
+1. ${t.line1}
+2. ${t.line2}
+3. ${t.line3}
 
-اكتب فقرتين تشرحان الخبر بتوسع (كل فقرة 60-80 كلمة)، دون إضافة معلومات غير موجودة. أعد JSON: {"paragraphs":["...","..."]}`;
+اكتب فقرتين تشرحان الخبر بتوسع (كل فقرة 60-80 كلمة)، دون إضافة معلومات غير موجودة في الأسطر الثلاثة.
+أعد JSON فقط: {"paragraphs":["...","..."]}`;
 
-  const res = await client.chat.completions.create({
-    model: 'gpt-4o',
-    messages: [{ role: 'user', content: prompt }],
-    response_format: { type: 'json_object' },
-    temperature: 0.6,
-  });
-
-  const content = res.choices[0]?.message?.content || '{}';
-  return JSON.parse(content) as AIDeepenResult;
+  if (ENGINE === 'mock') return mockDeepen(t);
+  if (ENGINE === 'ollama') return await ollamaJSON<AIDeepenResult>(prompt);
+  return await openaiJSON<AIDeepenResult>(prompt);
 }
 
-// اقتراح هاشتاقات
-export async function suggestTags(threeLines: ThreeLines): Promise<string[]> {
-  if (USE_MOCK) {
-    return mockTags(threeLines);
-  }
+export async function suggestTags(t: ThreeLines): Promise<string[]> {
+  const prompt = `استخرج 3 هاشتاقات عربية مناسبة لهذا الخبر (بدون رمز #):
+${t.line1}
+${t.line2}
+${t.line3}
 
+أعد JSON فقط: {"tags":["...","...","..."]}`;
+
+  if (ENGINE === 'mock') return mockTags(t);
+
+  try {
+    const data = ENGINE === 'ollama'
+      ? await ollamaJSON<{ tags: string[] }>(prompt)
+      : await openaiJSON<{ tags: string[] }>(prompt);
+    return data.tags || [];
+  } catch {
+    return mockTags(t);
+  }
+}
+
+// ============= Ollama Engine =============
+
+async function ollamaJSON<T>(prompt: string): Promise<T> {
+  const res = await fetch(`${OLLAMA_URL}/api/generate`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: OLLAMA_MODEL,
+      prompt,
+      format: 'json',
+      stream: false,
+      options: {
+        temperature: 0.4,
+        num_predict: 800,
+      },
+    }),
+  });
+
+  if (!res.ok) throw new Error(`Ollama error: ${res.status}`);
+  const data = await res.json();
+
+  // Ollama يرجع {response: "..."} والـ response هو JSON string
+  const content = data.response || '';
+  return JSON.parse(content) as T;
+}
+
+// ============= OpenAI Engine =============
+
+async function openaiJSON<T>(prompt: string): Promise<T> {
   const { OpenAI } = await import('openai');
   const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-  const prompt = `استخرج 3 هاشتاقات عربية مناسبة لهذا الخبر (بدون #):
-${threeLines.line1}
-${threeLines.line2}
-${threeLines.line3}
-
-أعد JSON: {"tags":["...","...","..."]}`;
-
   const res = await client.chat.completions.create({
-    model: 'gpt-4o',
+    model: process.env.OPENAI_MODEL || 'gpt-4o',
     messages: [{ role: 'user', content: prompt }],
     response_format: { type: 'json_object' },
     temperature: 0.5,
   });
 
-  const data = JSON.parse(res.choices[0]?.message?.content || '{"tags":[]}');
-  return data.tags || [];
+  const content = res.choices[0]?.message?.content || '{}';
+  return JSON.parse(content) as T;
 }
 
-// ============= MOCKS (للأوفلاين) =============
+// ============= Mock Engine =============
 
-function mockSummarize(text: string, hint?: string): ThreeLines {
+function mockSummarize(text: string): ThreeLines {
   const trimmed = text.trim().replace(/\s+/g, ' ');
   const words = trimmed.split(' ');
   const head = words.slice(0, 18).join(' ');
   const mid = words.slice(18, 36).join(' ') || 'السياق يكشف خلفية الحدث وارتباطه بمسار سابق في القطاع نفسه.';
   const tail = words.slice(36, 50).join(' ') || 'الأثر يطال شريحة واسعة من القراء على المدى القريب.';
-
   return {
     line1: head + (head.endsWith('.') ? '' : '.'),
     line2: mid + (mid.endsWith('.') ? '' : '.'),
@@ -124,9 +147,17 @@ function mockDeepen(t: ThreeLines): AIDeepenResult {
 }
 
 function mockTags(t: ThreeLines): string[] {
-  // استخراج كلمات مهمة من السطر الأول
-  const words = t.line1.split(/\s+/).filter(w => w.length > 3 && !['الذي', 'التي', 'هذا', 'هذه', 'ذلك', 'تلك'].includes(w));
+  const stopwords = ['الذي', 'التي', 'هذا', 'هذه', 'ذلك', 'تلك', 'على', 'عن', 'إلى', 'مع', 'من', 'في'];
+  const words = t.line1.split(/\s+/).filter(w => w.length > 3 && !stopwords.includes(w));
   return words.slice(0, 3);
 }
 
-export const isOffline = () => USE_MOCK;
+// ============= Utilities =============
+
+export const isOffline = () => ENGINE === 'mock' || ENGINE === 'ollama';
+export const currentEngine = () => ENGINE;
+export const currentModel = () => {
+  if (ENGINE === 'ollama') return OLLAMA_MODEL;
+  if (ENGINE === 'openai') return process.env.OPENAI_MODEL || 'gpt-4o';
+  return 'mock';
+};

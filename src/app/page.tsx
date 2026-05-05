@@ -2,8 +2,8 @@ import { db, articles } from '@/lib/db';
 import { desc, eq } from 'drizzle-orm';
 import Header from '@/components/Header';
 import ArticleCard from '@/components/ArticleCard';
-import { isOffline } from '@/lib/ai';
-import { Wifi, WifiOff } from 'lucide-react';
+import { isOffline, currentEngine, currentModel } from '@/lib/ai';
+import { WifiOff, Cpu, Cloud } from 'lucide-react';
 
 export default async function HomePage() {
   // الموجز اليومي - 5 الأبرز
@@ -25,11 +25,15 @@ export default async function HomePage() {
       <Header />
 
       <main className="max-w-7xl mx-auto px-4 lg:px-6 py-8">
-        {/* بانر الوضع المحلي */}
+        {/* بانر المحرك الحالي */}
         {isOffline() && (
-          <div className="mb-6 flex items-center gap-2 px-4 py-2.5 bg-amber-50 border border-amber-200 rounded-xl text-sm text-amber-900">
-            <WifiOff className="w-4 h-4" />
-            <span>الوضع المحلي مفعّل — كل البيانات والـ AI يشتغلون بدون انترنت</span>
+          <div className="mb-6 flex items-center gap-3 px-4 py-2.5 bg-emerald-50 border border-emerald-200 rounded-xl text-sm text-emerald-900">
+            {currentEngine() === 'ollama' ? <Cpu className="w-4 h-4" /> : <WifiOff className="w-4 h-4" />}
+            <span className="font-semibold">
+              {currentEngine() === 'ollama' ? 'محرك محلي:' : 'وضع Mock:'}
+            </span>
+            <code className="text-xs bg-white px-2 py-0.5 rounded font-mono">{currentModel()}</code>
+            <span className="text-emerald-700/80">— في Ollama على جهازك. لا انترنت مطلوب.</span>
           </div>
         )}
 
