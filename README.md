@@ -1,36 +1,114 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 📰 سطر — الخبر زبدة
 
-## Getting Started
+> صحيفة إلكترونية ذكية تقدم كل خبر في **3 أسطر فقط**. لا حشو، لا قشور.
 
-First, run the development server:
+## 🧠 الفكرة
+
+كل خبر يلتزم بقاعدة الأسطر الثلاثة:
+- **السطر 1:** الحدث (15-20 كلمة)
+- **السطر 2:** السياق (15-20 كلمة)
+- **السطر 3:** المعنى (10-15 كلمة)
+
+## 🚀 التشغيل المحلي (بدون انترنت)
+
+### المتطلبات
+- Node.js 22+
+- PostgreSQL 16 (محلي)
+
+### خطوات الإعداد
 
 ```bash
+# 1. تثبيت الحزم
+npm install
+
+# 2. إنشاء قاعدة البيانات (مرة واحدة)
+createdb satr
+
+# 3. تطبيق المخطط
+npx drizzle-kit push
+
+# 4. بذر بيانات تجريبية (10 أخبار)
+npx tsx scripts/seed.ts
+
+# 5. التشغيل
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+افتح: http://localhost:3000
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 🌐 الوضع المحلي (Offline Mode)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+التطبيق مصمم ليعمل **بالكامل بدون انترنت**:
 
-## Learn More
+| المكون | الوضع المحلي | الوضع الكامل |
+|--------|---------------|----------------|
+| قاعدة البيانات | PostgreSQL محلي | PostgreSQL محلي / Neon |
+| AI تلخيص | **Mock محلي** ✅ | OpenAI GPT-4o |
+| AI Deepen | **Mock محلي** ✅ | OpenAI GPT-4o |
+| الصور | Unsplash محفوظة | Cloudinary |
+| الخطوط | Google Fonts (cached) | Google Fonts |
 
-To learn more about Next.js, take a look at the following resources:
+### تفعيل/تعطيل وضع الـ AI Mock:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+# .env.local
+USE_AI_MOCK=true              # شغّل الـ mock (أوفلاين)
+OPENAI_API_KEY=sk-...         # أو فعّل OpenAI الحقيقي
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 📂 البنية
 
-## Deploy on Vercel
+```
+src/
+├── app/
+│   ├── page.tsx              # الموجز اليومي
+│   ├── category/[slug]/      # صفحات الأقسام
+│   ├── admin/                # لوحة التحرير
+│   │   ├── page.tsx          # قائمة الأخبار
+│   │   └── new/              # محرر بنظام الأسطر الثلاثة
+│   └── api/
+│       ├── articles/         # CRUD للأخبار
+│       └── ai/summarize/     # تلخيص ذكي
+├── components/
+│   ├── Header.tsx
+│   ├── Logo.tsx
+│   └── ArticleCard.tsx       # بطاقة الخبر مع AI Deepen
+├── lib/
+│   ├── db/                   # Drizzle + Postgres
+│   ├── ai/                   # طبقة AI مع Mock
+│   └── utils.ts
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 🎨 الهوية البصرية
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- **الخط:** Tajawal
+- **اللون الأساسي:** أزرق ليلي `#1a3a5e`
+- **الخلفية:** كريم دافئ `#faf7f2`
+- **البطاقات:** بيضاء + ظل خفيف
+- **العاجل:** أحمر `#c41e3a` مع نبض
+
+## 📡 الميزات الحالية
+
+✅ الموجز اليومي + الأقسام السبعة
+✅ بطاقة خبر بثلاثة أسطر مع نسق بصري واضح
+✅ AI Deepen (وضّح أكثر) - inline modal
+✅ شارة عاجل + شارة الثقة بالمصدر
+✅ توقيت عربي نسبي ("قبل ساعة")
+✅ هاشتاقات تلقائية
+✅ لوحة تحرير كاملة
+✅ محرر هجين: AI يقترح + بشري يراجع
+✅ عدّاد كلمات حي مع تحقق فوري
+✅ Mock للـ AI يشتغل أوفلاين
+
+## 🔮 القادم
+
+- [ ] Stack View للموبايل (Swipe up = التالي)
+- [ ] نشرة الفجر الصوتية (TTS)
+- [ ] Smart Tags + Timeline
+- [ ] Speed Reading Mode
+- [ ] قائمة القراءة + المزامنة
+- [ ] تطبيق iOS/Android
+
+## 📜 الترخيص
+
+خاص — أبو محمد © 2026
