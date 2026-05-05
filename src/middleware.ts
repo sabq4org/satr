@@ -26,8 +26,13 @@ export function middleware(req: NextRequest) {
     }
   }
 
-  // حماية API: كل POST/PUT/DELETE على /api/articles يحتاج جلسة
-  if (pathname.startsWith('/api/articles') && req.method !== 'GET') {
+  // حماية API: POST/PUT/DELETE على /api/articles يحتاج جلسة
+  // لكن /api/articles/[id]/deepen عام (يحتاجه أي قارئ)
+  if (
+    pathname.startsWith('/api/articles') &&
+    !pathname.endsWith('/deepen') &&
+    req.method !== 'GET'
+  ) {
     const token = req.cookies.get(SESSION_COOKIE)?.value;
     if (!quickVerify(token)) {
       return NextResponse.json({ error: 'غير مصرح' }, { status: 401 });
