@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { motion, AnimatePresence, PanInfo } from 'framer-motion';
+import { motion, useMotionValue, useTransform, PanInfo, animate } from 'framer-motion';
 import {
   Heart,
   Bookmark,
@@ -35,7 +35,7 @@ export default function StackView({ articles, initialIndex = 0, onClose }: Props
     setIndex((i) => Math.max(0, i - 1));
   }
 
-  function handleAction(action: 'liked' | 'saved' | 'skip') {
+  function recordAction(action: 'liked' | 'saved' | 'skip') {
     const article = articles[index];
     if (article) setActions((p) => ({ ...p, [article.id]: action }));
     next();
@@ -53,11 +53,11 @@ export default function StackView({ articles, initialIndex = 0, onClose }: Props
       } else if (e.key === 'Escape') {
         onClose?.();
       } else if (e.key === 'h' || e.key === 'l') {
-        handleAction('liked');
+        recordAction('liked');
       } else if (e.key === 'b' || e.key === 's') {
-        handleAction('saved');
+        recordAction('saved');
       } else if (e.key === 'x') {
-        handleAction('skip');
+        recordAction('skip');
       }
     }
     window.addEventListener('keydown', onKey);
@@ -68,10 +68,16 @@ export default function StackView({ articles, initialIndex = 0, onClose }: Props
   if (total === 0) return null;
 
   if (index >= total) {
-    return <EndScreen onRestart={() => setIndex(0)} actions={actions} articles={articles} onClose={onClose} />;
+    return (
+      <EndScreen
+        onRestart={() => setIndex(0)}
+        actions={actions}
+        articles={articles}
+        onClose={onClose}
+      />
+    );
   }
 
-  // اعرض البطاقة الحالية + خلفها بطاقة (للعمق)
   const current = articles[index];
   const behind = articles[index + 1];
 
@@ -111,52 +117,47 @@ export default function StackView({ articles, initialIndex = 0, onClose }: Props
       {/* منطقة البطاقات */}
       <div className="absolute inset-0 pt-20 pb-24 px-4 flex items-center justify-center">
         <div className="relative w-full max-w-md h-full max-h-[640px]">
-          {/* بطاقة الخلف (ثابتة، بدون animations مزعجة) */}
+          {/* بطاقة الخلف: ثابتة 100%، ما تتحرك أبداً = صفر اهتزاز */}
           {behind && (
             <div
               className="absolute inset-0 satr-card overflow-hidden pointer-events-none"
               style={{
                 transform: 'translateY(10px) scale(0.96)',
-                opacity: 0.6,
-                zIndex: 1,
+                opacity: 0.55,
               }}
+              aria-hidden
             >
-              <div className="h-full bg-[var(--paper)]" />
+              <div className="h-full w-full bg-[var(--paper)]" />
             </div>
           )}
 
-          {/* البطاقة الحالية - تدخل من تحت، تخرج لفوق */}
-          <AnimatePresence mode="popLayout">
-            <SwipeCard
-              key={current.id}
-              article={current}
-              onSwipeUp={next}
-              onSwipeDown={prev}
-              onLike={() => handleAction('liked')}
-              onSave={() => handleAction('saved')}
-              onSkip={() => handleAction('skip')}
-            />
-          </AnimatePresence>
+          {/* البطاقة الأمامية: key فريد لكل خبر */}
+          <SwipeCard
+            key={current.id}
+            article={current}
+            onConsume={recordAction}
+            onPrev={prev}
+          />
         </div>
       </div>
 
-      {/* الأزرار السفلية - ثلاثة فقط، عائمة، بدون خلفية */}
+      {/* الأزرار السفلية */}
       <div className="absolute bottom-0 inset-x-0 z-30 pb-[max(env(safe-area-inset-bottom),16px)] pt-3 flex items-center justify-center gap-5">
         <ActionButton
-          onClick={() => handleAction('skip')}
+          onClick={() => recordAction('skip')}
           color="bg-white/10 backdrop-blur-md hover:bg-white/20 ring-1 ring-white/20"
           icon={<X className="w-5 h-5" />}
           label="تخطي"
         />
         <ActionButton
-          onClick={() => handleAction('liked')}
+          onClick={() => recordAction('liked')}
           color="bg-rose-500 hover:bg-rose-600 ring-4 ring-rose-500/20"
           icon={<Heart className="w-6 h-6 fill-current" />}
           label="إعجاب"
           big
         />
         <ActionButton
-          onClick={() => handleAction('saved')}
+          onClick={() => recordAction('saved')}
           color="bg-amber-400 hover:bg-amber-500 text-[#1a3a5e] ring-1 ring-amber-300/40"
           icon={<Bookmark className="w-5 h-5 fill-current" />}
           label="حفظ"
@@ -195,21 +196,27 @@ function ActionButton({
   );
 }
 
+/**
+ * البطاقة الأمامية:
+ * - تظهر بسلاسة من الموضع الافتراضي (بدون pop-in animation)
+ * - تتبع السحب مباشرة عبر motion values
+ * - لمّا تتجاوز العتبة، تطير في الاتجاه ثم يتقدّم index
+ * - بمجرد ما React يعطي key جديد، البطاقة الجديدة تتركّب في الموضع 0,0 بدون أي حركة دخول
+ */
 function SwipeCard({
   article,
-  onSwipeUp,
-  onSwipeDown,
-  onLike,
-  onSave,
-  onSkip,
+  onConsume,
+  onPrev,
 }: {
   article: Article;
-  onSwipeUp: () => void;
-  onSwipeDown: () => void;
-  onLike: () => void;
-  onSave: () => void;
-  onSkip: () => void;
+  onConsume: (action: 'liked' | 'saved' | 'skip') => void;
+  onPrev: () => void;
 }) {
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+  const rotate = useTransform(x, [-200, 0, 200], [-8, 0, 8]);
+  const consumed = useRef(false);
+
   const [showDeepen, setShowDeepen] = useState(false);
   const [deepenContent, setDeepenContent] = useState<string[] | null>(null);
   const [deepening, setDeepening] = useState(false);
@@ -233,31 +240,59 @@ function SwipeCard({
     }
   }
 
-  function onDragEnd(_: unknown, info: PanInfo) {
-    const T = 100;
-    if (info.offset.y < -T || info.velocity.y < -500) onSwipeUp();
-    else if (info.offset.y > T || info.velocity.y > 500) onSwipeDown();
-    else if (info.offset.x < -T) onSkip();
-    else if (info.offset.x > T) onLike();
+  function flyOut(action: 'liked' | 'saved' | 'skip', dir: { x?: number; y?: number }) {
+    if (consumed.current) return;
+    consumed.current = true;
+
+    const xTarget = dir.x ?? 0;
+    const yTarget = dir.y ?? 0;
+    const opts = { duration: 0.22, ease: [0.32, 0.72, 0, 1] as [number, number, number, number] };
+
+    if (xTarget !== 0) animate(x, xTarget, opts);
+    if (yTarget !== 0) animate(y, yTarget, opts);
+
+    // بعد ما تطير، نخبر الأب يقدّم
+    setTimeout(() => onConsume(action), 200);
   }
 
-  // هل في صورة؟
+  function onDragEnd(_: unknown, info: PanInfo) {
+    const T = 100;
+    const { offset, velocity } = info;
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+
+    if (offset.y < -T || velocity.y < -500) {
+      // اسحب للأعلى = skip
+      flyOut('skip', { y: -h });
+    } else if (offset.y > T || velocity.y > 500) {
+      // اسحب للأسفل = ارجع
+      // ارجع بسلاسة لمكانها ثم استدعِ prev (بدون استهلاك)
+      animate(x, 0, { duration: 0.18 });
+      animate(y, 0, { duration: 0.18 });
+      onPrev();
+    } else if (offset.x < -T) {
+      flyOut('skip', { x: -w });
+    } else if (offset.x > T) {
+      flyOut('liked', { x: w });
+    } else {
+      // ما تجاوز العتبة، رجعها لمكانها
+      animate(x, 0, { type: 'spring', stiffness: 400, damping: 30 });
+      animate(y, 0, { type: 'spring', stiffness: 400, damping: 30 });
+    }
+  }
+
   const hasImage = Boolean(article.imageUrl);
 
   return (
     <motion.div
       drag
-      dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
-      dragElastic={0.5}
+      dragElastic={0.6}
+      dragMomentum={false}
       onDragEnd={onDragEnd}
-      initial={{ opacity: 0, y: 60, scale: 0.95 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      exit={{ opacity: 0, y: -300, scale: 0.85, transition: { duration: 0.22 } }}
-      transition={{ type: 'spring', stiffness: 350, damping: 32, mass: 0.8 }}
+      style={{ x, y, rotate, zIndex: 10 }}
       className="absolute inset-0 satr-card overflow-hidden flex flex-col cursor-grab active:cursor-grabbing"
-      style={{ zIndex: 10 }}
     >
-      {/* الترويسة - شارات + قسم */}
+      {/* الترويسة */}
       <div className="flex-shrink-0 px-5 pt-5 pb-3 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <span className={`cat-badge cat-${article.category}`}>
@@ -270,7 +305,7 @@ function SwipeCard({
         </span>
       </div>
 
-      {/* الصورة - حجم محدود */}
+      {/* الصورة */}
       {hasImage && (
         <div className="flex-shrink-0 relative h-40 mx-5 rounded-xl overflow-hidden bg-[var(--accent-light)]">
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -283,13 +318,12 @@ function SwipeCard({
         </div>
       )}
 
-      {/* المحتوى - يأخذ كل المساحة المتبقية */}
+      {/* المحتوى */}
       <div
         className="flex-1 min-h-0 overflow-y-auto px-5 py-4 overscroll-contain"
         style={{ touchAction: 'pan-y' }}
         onPointerDown={(e) => e.stopPropagation()}
       >
-        {/* الأسطر الثلاثة */}
         <div className="space-y-3.5 mb-4">
           <div className="relative pr-9">
             <span className="absolute right-0 top-0 w-7 h-7 rounded-full bg-[var(--accent-light)] text-[var(--accent)] text-xs font-black flex items-center justify-center">
@@ -317,7 +351,6 @@ function SwipeCard({
           </div>
         </div>
 
-        {/* Deepen */}
         {showDeepen && (
           <div className="mb-3 p-4 rounded-xl bg-[var(--accent-light)]/40 border border-[var(--accent-light)]">
             {deepening ? (
@@ -338,10 +371,14 @@ function SwipeCard({
         )}
       </div>
 
-      {/* الفوتر - ثابت في الأسفل */}
+      {/* الفوتر */}
       <div className="flex-shrink-0 px-5 py-3 border-t border-[var(--border)] flex items-center justify-between gap-2 bg-[var(--paper)]">
         <div className="flex items-center gap-1.5 text-[var(--ink-faint)]">
-          {trust && <span className="text-xs" title={trust.label}>{trust.icon}</span>}
+          {trust && (
+            <span className="text-xs" title={trust.label}>
+              {trust.icon}
+            </span>
+          )}
         </div>
         <div className="flex items-center gap-2">
           {!showDeepen && (
