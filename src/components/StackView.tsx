@@ -109,7 +109,7 @@ export default function StackView({ articles, initialIndex = 0, onClose }: Props
       </div>
 
       {/* منطقة البطاقات */}
-      <div className="absolute inset-0 pt-20 pb-36 px-4 flex items-center justify-center">
+      <div className="absolute inset-0 pt-20 pb-24 px-4 flex items-center justify-center">
         <div className="relative w-full max-w-md h-full max-h-[640px]">
           {/* بطاقة الخلف (ثابتة، بدون animations مزعجة) */}
           {behind && (
@@ -140,32 +140,27 @@ export default function StackView({ articles, initialIndex = 0, onClose }: Props
         </div>
       </div>
 
-      {/* الأزرار السفلية */}
-      <div className="absolute bottom-0 inset-x-0 z-30 pb-7 pt-3 px-6 bg-gradient-to-t from-black/70 via-black/40 to-transparent">
-        <div className="flex items-center justify-center gap-4 mb-2">
-          <ActionButton
-            onClick={() => handleAction('skip')}
-            color="bg-white/15 hover:bg-white/25"
-            icon={<X className="w-5 h-5" />}
-            label="تخطي"
-          />
-          <ActionButton
-            onClick={() => handleAction('liked')}
-            color="bg-rose-500 hover:bg-rose-600"
-            icon={<Heart className="w-6 h-6 fill-current" />}
-            label="إعجاب"
-            big
-          />
-          <ActionButton
-            onClick={() => handleAction('saved')}
-            color="bg-amber-400 hover:bg-amber-500 text-[#1a3a5e]"
-            icon={<Bookmark className="w-5 h-5 fill-current" />}
-            label="حفظ"
-          />
-        </div>
-        <p className="text-center text-[10px] text-white/50">
-          اسحب للأعلى للتالي • اسحب للأسفل للسابق • Esc للخروج
-        </p>
+      {/* الأزرار السفلية - ثلاثة فقط، عائمة، بدون خلفية */}
+      <div className="absolute bottom-0 inset-x-0 z-30 pb-[max(env(safe-area-inset-bottom),16px)] pt-3 flex items-center justify-center gap-5">
+        <ActionButton
+          onClick={() => handleAction('skip')}
+          color="bg-white/10 backdrop-blur-md hover:bg-white/20 ring-1 ring-white/20"
+          icon={<X className="w-5 h-5" />}
+          label="تخطي"
+        />
+        <ActionButton
+          onClick={() => handleAction('liked')}
+          color="bg-rose-500 hover:bg-rose-600 ring-4 ring-rose-500/20"
+          icon={<Heart className="w-6 h-6 fill-current" />}
+          label="إعجاب"
+          big
+        />
+        <ActionButton
+          onClick={() => handleAction('saved')}
+          color="bg-amber-400 hover:bg-amber-500 text-[#1a3a5e] ring-1 ring-amber-300/40"
+          icon={<Bookmark className="w-5 h-5 fill-current" />}
+          label="حفظ"
+        />
       </div>
     </div>
   );
@@ -188,11 +183,12 @@ function ActionButton({
     <button
       onClick={onClick}
       className={cn(
-        'flex flex-col items-center gap-1 rounded-full text-white shadow-lg transition-transform hover:scale-110 active:scale-95',
+        'flex items-center justify-center rounded-full text-white shadow-2xl transition-transform hover:scale-110 active:scale-95',
         color,
-        big ? 'w-16 h-16' : 'w-12 h-12',
+        big ? 'w-14 h-14' : 'w-11 h-11',
       )}
       aria-label={label}
+      title={label}
     >
       {icon}
     </button>
