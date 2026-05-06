@@ -142,7 +142,7 @@ export default function ArticleCard({ article, variant = 'default' }: Props) {
               <Link
                 key={tag}
                 href={`/tag/${encodeURIComponent(tag)}`}
-                onClick={stop}
+                onClick={(e) => e.stopPropagation()}
                 className="tag relative z-20"
               >
                 #{tag}
