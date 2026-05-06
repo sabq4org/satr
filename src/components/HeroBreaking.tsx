@@ -7,10 +7,10 @@ import { CATEGORY_LABELS, arabicTimeAgo } from '@/lib/utils';
 
 export default function HeroBreaking({ article }: { article: Article }) {
   return (
-    <article className="relative mb-12 overflow-hidden satr-card">
-      <div className="grid grid-cols-1 md:grid-cols-2 min-h-[420px]">
+    <article className="relative mb-10 overflow-hidden satr-card">
+      <div className="grid grid-cols-1 md:grid-cols-5 min-h-[280px] md:min-h-[320px]">
         {/* الصورة */}
-        <div className="relative h-64 md:h-auto bg-gradient-to-br from-[var(--accent)] to-[#0d2440] overflow-hidden order-1 md:order-2">
+        <div className="relative h-48 md:h-auto md:col-span-2 bg-gradient-to-br from-[var(--accent)] to-[#0d2440] overflow-hidden order-1 md:order-2">
           {article.imageUrl ? (
             <>
               {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -39,21 +39,21 @@ export default function HeroBreaking({ article }: { article: Article }) {
         </div>
 
         {/* النص */}
-        <div className="p-6 md:p-10 flex flex-col justify-center order-2 md:order-1">
-          <p className="text-xs font-bold tracking-widest text-[var(--accent)] mb-4">
+        <div className="p-5 md:p-7 md:col-span-3 flex flex-col justify-center order-2 md:order-1">
+          <p className="text-[11px] font-bold tracking-widest text-[var(--accent)] mb-3">
             {arabicTimeAgo(article.publishedAt || article.createdAt)} •{' '}
             {CATEGORY_LABELS[article.category]}
           </p>
 
-          <div className="space-y-4 mb-6">
-            <p className="text-xl md:text-2xl font-black leading-relaxed text-[var(--ink)]">
+          <div className="space-y-2.5 mb-4">
+            <p className="text-lg md:text-xl font-black leading-snug text-[var(--ink)]">
               {article.line1}
             </p>
-            <p className="text-base md:text-lg font-medium leading-relaxed text-[var(--ink-soft)]">
+            <p className="text-sm md:text-base font-medium leading-relaxed text-[var(--ink-soft)]">
               {article.line2}
             </p>
-            <div className="relative pr-4 border-r-4 border-[var(--accent)]">
-              <p className="text-base md:text-lg font-bold italic leading-relaxed text-[var(--accent)]">
+            <div className="relative pr-3 border-r-[3px] border-[var(--accent)]">
+              <p className="text-sm md:text-base font-bold italic leading-relaxed text-[var(--accent)]">
                 {article.line3}
               </p>
             </div>
