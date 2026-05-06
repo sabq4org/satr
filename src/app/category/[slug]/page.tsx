@@ -34,7 +34,7 @@ export default async function CategoryPage({
             {CATEGORY_LABELS[slug as Category]}
           </h1>
           <p className="text-sm text-[var(--ink-soft)]">
-            {results.length} خبر — كل واحد في 3 أسطر
+            {results.length} خبر — كل واحد في ٣ سطور
           </p>
         </div>
 

@@ -4,7 +4,7 @@ import { Sparkles } from 'lucide-react';
 
 export const metadata = {
   title: 'قاعدة الـ3',
-  description: 'فلسفة سطر: كل خبر في 3 أسطر — الحدث، السياق، المعنى.',
+  description: 'فلسفة سطر: كل خبر في ٣ سطور — الحدث، السياق، المعنى.',
 };
 
 export default function ManifestoPage() {
@@ -74,7 +74,7 @@ export default function ManifestoPage() {
 
         {/* لماذا */}
         <div className="space-y-8 mb-12">
-          <Section title="لماذا 3 أسطر؟" icon={<Sparkles className="w-5 h-5" />}>
+          <Section title="لماذا ٣ سطور؟" icon={<Sparkles className="w-5 h-5" />}>
             <p>
               متوسط وقت القراءة على الموبايل اليوم لا يتجاوز <strong>8 ثوانٍ</strong>. 70% من القراء لا يكملون
               خبراً يتجاوز 600 كلمة. السوشال ميديا غيّرت "نَفَس" القارئ، وقتله الجبّار يطلب جوهراً مكثفاً.
@@ -91,7 +91,7 @@ export default function ManifestoPage() {
                 'الذكاء يقترح، البشري يحرر — ولا نشر بدون مراجعة بشرية.',
                 'كل خبر يحمل شارة ثقة المصدر (🟢 رسمي / 🟡 وكالة / 🔵 شريكة).',
                 'لا عناوين مضللة، لا "ستصدمك"، لا قنابل عاطفية.',
-                'إذا كان الخبر يحتاج أكثر من 3 أسطر، فإما أنه عدة أخبار، أو لم يُحرَّر بعد.',
+                'إذا كان الخبر يحتاج أكثر من ٣ سطور، فإما أنه عدة أخبار، أو لم يُحرَّر بعد.',
               ].map((p, i) => (
                 <li key={i} className="flex gap-3 items-start">
                   <span className="flex-shrink-0 w-6 h-6 rounded-full bg-[var(--accent-light)] text-[var(--accent)] text-xs font-black flex items-center justify-center mt-0.5">

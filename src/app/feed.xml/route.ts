@@ -23,9 +23,9 @@ export async function GET(req: Request) {
   const xml = `<?xml version="1.0" encoding="UTF-8" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xml:lang="ar">
 <channel>
-  <title>سطر — الخبر زبدة</title>
+  <title>سطر — كل خبر في ٣ سطور</title>
   <link>${origin}</link>
-  <description>صحيفة ذكية مختصرة. كل خبر في 3 أسطر.</description>
+  <description>صحيفة ذكية مختصرة. كل خبر في ٣ سطور.</description>
   <language>ar</language>
   <atom:link href="${origin}/feed.xml" rel="self" type="application/rss+xml" />
   ${items

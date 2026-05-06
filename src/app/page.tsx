@@ -87,7 +87,7 @@ export default async function HomePage() {
               الموجز اليومي
             </h1>
             <p className="text-[var(--ink-soft)] text-sm md:text-base">
-              {totalCount} خبر مختصر بعناية. كل خبر في 3 أسطر — لا أكثر.
+              {totalCount} خبر مختصر بعناية. كل خبر في ٣ سطور — لا أكثر.
             </p>
           </div>
           <StackButton />
@@ -159,7 +159,7 @@ export default async function HomePage() {
             <div>
               <p className="font-black text-[var(--accent)] text-2xl mb-2">سطر</p>
               <p className="text-sm text-[var(--ink-soft)] leading-relaxed">
-                صحيفة ذكية مختصرة. كل خبر في 3 أسطر فقط — الحدث، السياق، المعنى.
+                صحيفة ذكية مختصرة. كل خبر في ٣ سطور — الحدث، السياق، المعنى.
               </p>
             </div>
             <div>
@@ -199,7 +199,7 @@ export default async function HomePage() {
             </div>
           </div>
           <div className="text-center text-xs text-[var(--ink-faint)] pb-6">
-            © 2026 سطر. الخبر زبدة.
+            © 2026 سطر. كل خبر في ٣ سطور.
           </div>
         </footer>
       </main>

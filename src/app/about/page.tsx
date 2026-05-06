@@ -4,7 +4,7 @@ import { ArrowLeft, Sparkles, Code2 } from 'lucide-react';
 
 export const metadata = {
   title: 'من نحن',
-  description: 'سطر — صحيفة ذكية مختصرة. كل خبر في 3 أسطر.',
+  description: 'سطر — صحيفة ذكية مختصرة. كل خبر في ٣ سطور.',
 };
 
 export default function AboutPage() {
@@ -20,7 +20,7 @@ export default function AboutPage() {
         <div className="space-y-8">
           <Box title="الفكرة">
             <p>
-              <strong>سطر</strong> صحيفة إلكترونية ذكية تقدّم كل خبر في 3 أسطر فقط:{' '}
+              <strong>سطر</strong> صحيفة إلكترونية ذكية تقدّم كل خبر في ٣ سطور فقط:{' '}
               <em>الحدث، السياق، المعنى</em>. ليس اختصاراً متعجلاً، بل تحريراً مكثفاً يحوّل الخبر إلى منتج
               تحريري كامل بحجم تغريدة.
             </p>

@@ -17,7 +17,7 @@ export default function Logo({ size = 'md' }: { size?: 'sm' | 'md' | 'lg' }) {
         <span className="w-8 h-[3px] bg-[var(--accent)] rounded-full mb-1 group-hover:w-12 transition-all" />
       </div>
       <span className={`${s.sub} text-[var(--ink-soft)] font-medium tracking-wide`}>
-        الخبر زبدة
+        كل خبر في ٣ سطور
       </span>
     </Link>
   );
