@@ -1,6 +1,6 @@
 import type { MetadataRoute } from 'next';
 import { db, articles } from '@/lib/db';
-import { eq, desc } from 'drizzle-orm';
+import { eq, desc, sql } from 'drizzle-orm';
 import { CATEGORY_LABELS } from '@/lib/utils';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -25,6 +25,19 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   }));
 
+  // Tags: pull distinct tags from published articles
+  const tagRows = (await db.execute<{ tag: string }>(sql`
+    SELECT DISTINCT tag
+    FROM ${articles}, jsonb_array_elements_text(${articles.tags}) AS tag
+    WHERE ${articles.status} = 'published'
+    LIMIT 500
+  `)) as unknown as { tag: string }[];
+  const tagUrls: MetadataRoute.Sitemap = tagRows.map((r) => ({
+    url: `${base}/tag/${encodeURIComponent(r.tag)}`,
+    changeFrequency: 'daily',
+    priority: 0.6,
+  }));
+
   return [
     {
       url: base,
@@ -36,7 +49,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'hourly',
       priority: 0.9,
     },
+    {
+      url: `${base}/tags`,
+      changeFrequency: 'daily',
+      priority: 0.7,
+    },
     ...categoryUrls,
+    ...tagUrls,
     ...articleUrls,
   ];
 }

@@ -176,6 +176,11 @@ export default async function HomePage() {
                   </a>
                 </li>
                 <li>
+                  <a href="/tags" className="hover:text-[var(--accent)] transition-colors">
+                    كل الوسوم #
+                  </a>
+                </li>
+                <li>
                   <a href="/feed.xml" className="hover:text-[var(--accent)] transition-colors">
                     RSS
                   </a>
