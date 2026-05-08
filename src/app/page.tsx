@@ -3,7 +3,6 @@ import { desc, eq, and, gte } from 'drizzle-orm';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import ArticleCard from '@/components/ArticleCard';
-import HeroBreaking from '@/components/HeroBreaking';
 import LiveBar from '@/components/LiveBar';
 import TodaysPulse from '@/components/TodaysPulse';
 import EmptyState from '@/components/EmptyState';
@@ -80,11 +79,8 @@ export default async function HomePage() {
             {/* نبض اليوم — تاريخ + عنوان + ميتا إحصائية + كومة */}
             <TodaysPulse articles={latest} breakingCount={breaking.length} />
 
-            {/* البطاقة المميزة (Hero) */}
-            {featured[0] && <HeroBreaking article={featured[0]} />}
-
-            {/* بقية المميزة */}
-            {featured.length > 1 && (
+            {/* المميزة — الأول بطاقة عريضة، الباقي شبكة */}
+            {featured.length > 0 && (
               <>
                 <section className="section-divider">
                   <h2 className="flex items-center gap-2">
@@ -93,11 +89,19 @@ export default async function HomePage() {
                   </h2>
                 </section>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mb-12">
-                  {featured.slice(1).map((article) => (
-                    <ArticleCard key={article.id} article={article} />
-                  ))}
+                {/* البطاقة الأولى - عريضة */}
+                <div className="mb-5">
+                  <ArticleCard article={featured[0]} variant="featured" />
                 </div>
+
+                {/* بقية المميزة */}
+                {featured.length > 1 && (
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-12">
+                    {featured.slice(1).map((article) => (
+                      <ArticleCard key={article.id} article={article} variant="compact" />
+                    ))}
+                  </div>
+                )}
               </>
             )}
 
@@ -127,9 +131,9 @@ export default async function HomePage() {
               </h2>
             </section>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
               {latestFiltered.map((article) => (
-                <ArticleCard key={article.id} article={article} />
+                <ArticleCard key={article.id} article={article} variant="compact" />
               ))}
             </div>
           </>

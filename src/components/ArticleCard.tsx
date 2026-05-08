@@ -69,12 +69,65 @@ export default function ArticleCard({ article, variant = 'default' }: Props) {
   const seconds = readTime(article.line1, article.line2, article.line3);
   const fresh = isFresh(article);
 
+  // featured: بطاقة أفقية عريضة (صورة يمين + نص يسار)
+  if (variant === 'featured') {
+    return (
+      <article className={cn('satr-card overflow-hidden group relative flex flex-col md:flex-row', fresh && 'satr-card-fresh')}>
+        <span aria-hidden className="absolute right-0 top-0 bottom-0 w-[3px] opacity-70 group-hover:opacity-100 transition-opacity" style={{ background: `var(--${article.category})` }} />
+        <Link href={articleUrl} className="absolute inset-0 z-10" aria-label={`اقرأ: ${article.line1}`}>
+          <span className="sr-only">{article.line1}</span>
+        </Link>
+        {article.imageUrl && (
+          <div className="relative w-full md:w-72 lg:w-80 flex-shrink-0 h-48 md:h-auto overflow-hidden bg-[var(--accent-light)]">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={article.imageUrl} alt={article.imageAlt || article.line1} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out" loading="lazy" />
+            <span aria-hidden className="absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-black/30 to-transparent" />
+            {article.isBreaking && <div className="absolute top-3 right-3"><span className="breaking-badge">عاجل</span></div>}
+          </div>
+        )}
+        <div className="p-5 flex flex-col justify-between flex-1">
+          <div>
+            <div className="flex items-center gap-2 mb-3 text-xs flex-wrap">
+              <span className={`cat-badge cat-${article.category}`}>{CATEGORY_LABELS[article.category]}</span>
+              <span className="read-time"><Clock3 className="w-3 h-3" />{toArabicNum(seconds)} ث</span>
+              <span className="text-[var(--ink-faint)] mr-auto">{arabicTimeAgo(article.publishedAt || article.createdAt)}</span>
+            </div>
+            <div className="space-y-2 mb-4">
+              <p className="satr-line satr-line-1 text-lg">{article.line1}</p>
+              <p className="satr-line satr-line-2">{article.line2}</p>
+              <p className="satr-line satr-line-3">{article.line3}</p>
+            </div>
+          </div>
+          <div className="relative z-20 flex items-center gap-2 pt-3 border-t border-[var(--border)]">
+            <button onClick={handleDeepen} className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold text-[var(--accent)] bg-[var(--accent-light)] hover:bg-[var(--accent)] hover:text-white transition-all">
+              <Sparkles className="w-3.5 h-3.5" />{showDeepen ? 'إخفاء' : 'وضّح أكثر'}
+            </button>
+            <button onClick={(e) => { stop(e); setLiked(!liked); }} className={cn('p-1.5 rounded-full hover:bg-[var(--accent-light)] transition-colors mr-auto', liked && 'text-red-500')} aria-label="إعجاب">
+              <Heart className={cn('w-4 h-4', liked && 'fill-current')} />
+            </button>
+            <button onClick={(e) => { stop(e); setSaved(!saved); }} className={cn('p-1.5 rounded-full hover:bg-[var(--accent-light)] transition-colors', saved && 'text-[var(--accent)]')} aria-label="حفظ">
+              <Bookmark className={cn('w-4 h-4', saved && 'fill-current')} />
+            </button>
+            <button onClick={shareArticle} className="p-1.5 rounded-full hover:bg-[var(--accent-light)] transition-colors" aria-label="مشاركة">
+              <Share2 className="w-4 h-4" />
+            </button>
+          </div>
+          {showDeepen && (
+            <div onClick={stop} className="relative z-20 mt-3 p-3 bg-[var(--accent-light)]/40 rounded-xl border border-[var(--accent-light)] fade-in-up">
+              {deepening ? <div className="flex items-center gap-2 text-sm text-[var(--accent)]"><Sparkles className="w-4 h-4 animate-pulse" /><span>جاري التوسعة...</span></div>
+              : <div className="space-y-2 text-sm leading-relaxed text-[var(--ink)]">{deepenContent?.map((p, i) => <p key={i}>{p}</p>)}</div>}
+            </div>
+          )}
+        </div>
+      </article>
+    );
+  }
+
   return (
     <article
       className={cn(
         'satr-card overflow-hidden group relative',
         fresh && 'satr-card-fresh',
-        variant === 'featured' && 'lg:col-span-2',
       )}
     >
       {/* شريط لون القسم على اليمين كتوقيع تحريري */}
@@ -98,7 +151,7 @@ export default function ArticleCard({ article, variant = 'default' }: Props) {
         <div
           className={cn(
             'relative w-full overflow-hidden bg-[var(--accent-light)]',
-            variant === 'featured' ? 'h-64 md:h-80' : 'h-48',
+            'h-36',
           )}
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -119,7 +172,7 @@ export default function ArticleCard({ article, variant = 'default' }: Props) {
         </div>
       )}
 
-      <div className="p-5 relative">
+      <div className={cn('relative', variant === 'compact' ? 'p-3' : 'p-4')}>
         {/* السطر العلوي: التصنيف + الوقت + وقت القراءة */}
         <div className="flex items-center justify-between mb-4 text-xs gap-2 flex-wrap">
           <div className="flex items-center gap-2">
@@ -140,10 +193,10 @@ export default function ArticleCard({ article, variant = 'default' }: Props) {
         </div>
 
         {/* الأسطر الثلاثة - الجوهر */}
-        <div className="space-y-3 mb-5">
-          <p className="satr-line satr-line-1">{article.line1}</p>
-          <p className="satr-line satr-line-2">{article.line2}</p>
-          <p className="satr-line satr-line-3">{article.line3}</p>
+        <div className={cn('mb-3', variant === 'compact' ? 'space-y-1.5' : 'space-y-2')}>
+          <p className={cn('satr-line satr-line-1', variant === 'compact' && 'text-sm')}>{article.line1}</p>
+          <p className={cn('satr-line satr-line-2', variant === 'compact' && 'text-xs')}>{article.line2}</p>
+          <p className={cn('satr-line satr-line-3', variant === 'compact' && 'text-xs')}>{article.line3}</p>
         </div>
 
         {/* AI Deepen */}
