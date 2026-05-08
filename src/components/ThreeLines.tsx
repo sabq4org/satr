@@ -13,10 +13,10 @@ interface Props {
 }
 
 /**
- * عرض الأسطر الثلاثة بإيقاع تحريري:
- * - رقم عربي واضح
- * - تسمية صغيرة ('الحدث' / 'السياق' / 'المعنى')
- * - كشف تتابعي عند الدخول
+ * عرض الأسطر الثلاثة في صفحة المقال — إيقاع مجلة راقٍ:
+ *  • رقم وتسمية صغيرة على الجنب (الحدث / السياق / المعنى)
+ *  • فواصل ناعمة بين الأسطر
+ *  • كشف تتابعي عند الدخول (line-reveal)
  */
 export default function ThreeLines({ line1, line2, line3 }: Props) {
   const [reveal, setReveal] = useState(false);
@@ -31,32 +31,30 @@ export default function ThreeLines({ line1, line2, line3 }: Props) {
   const lines = [line1, line2, line3];
 
   return (
-    <div className="space-y-6 mb-8 relative">
+    <div className="my-2">
       {lines.map((line, i) => (
         <div
           key={i}
           className={cn(
-            'relative pr-14 transition-all',
+            'relative pr-12 md:pr-14 py-5',
+            i > 0 && 'border-t border-[var(--border-soft)]',
             reveal && !reduced ? 'line-reveal' : 'opacity-100',
           )}
           style={{ animationDelay: reveal && !reduced ? `${i * 0.18}s` : undefined }}
         >
-          {/* رقم */}
-          <div
-            aria-hidden
-            className="absolute right-0 top-0 flex flex-col items-center"
-          >
+          {/* رقم + تسمية */}
+          <div aria-hidden className="absolute right-0 top-5 flex flex-col items-center gap-1">
             <div
               className={cn(
-                'w-10 h-10 rounded-full flex items-center justify-center font-black text-base',
+                'w-8 h-8 rounded-full flex items-center justify-center font-black text-sm',
                 i === 2
                   ? 'bg-[var(--accent)] text-white'
-                  : 'bg-[var(--accent-light)] text-[var(--accent)]',
+                  : 'bg-[var(--accent-wash)] text-[var(--accent)]',
               )}
             >
               {LINE_NUMBERS[i]}
             </div>
-            <span className="text-[10px] font-bold text-[var(--ink-faint)] tracking-widest mt-1.5 uppercase">
+            <span className="text-[9px] font-bold text-[var(--ink-faint)] tracking-[0.18em] uppercase">
               {LINE_LABELS[i]}
             </span>
           </div>
@@ -65,9 +63,9 @@ export default function ThreeLines({ line1, line2, line3 }: Props) {
           <p
             className={cn(
               'leading-loose',
-              i === 0 && 'text-xl md:text-2xl font-black text-[var(--ink)] tracking-tight',
-              i === 1 && 'text-base md:text-lg font-medium text-[var(--ink-soft)]',
-              i === 2 && 'text-base md:text-lg font-bold text-[var(--accent)] italic',
+              i === 0 && 'text-xl md:text-[1.75rem] font-black text-[var(--ink)] tracking-tight',
+              i === 1 && 'text-base md:text-[17px] font-medium text-[var(--ink-soft)]',
+              i === 2 && 'text-base md:text-[17px] font-bold text-[var(--accent)] italic',
             )}
           >
             {line}

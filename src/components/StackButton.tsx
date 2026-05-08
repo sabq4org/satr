@@ -1,17 +1,16 @@
 import Link from 'next/link';
-import { Layers } from 'lucide-react';
+import { Layers, ArrowLeft } from 'lucide-react';
 
 export default function StackButton() {
   return (
     <Link
       href="/stack"
-      className="self-start inline-flex items-center gap-2 px-5 py-3 bg-gradient-to-l from-[var(--accent)] to-[#2a4a6e] text-white rounded-2xl font-bold text-sm hover:shadow-lg hover:scale-[1.02] active:scale-100 transition-all group"
+      className="inline-flex items-center gap-2 px-4 py-2.5 bg-[var(--paper)] text-[var(--accent)] rounded-full text-sm font-bold border border-[var(--accent-light)] hover:border-[var(--accent)] hover:bg-[var(--accent)] hover:text-white transition-all group"
+      title="عرض الكومة بأسلوب Tinder Swipe"
     >
-      <Layers className="w-4 h-4 group-hover:rotate-12 transition-transform" />
+      <Layers className="w-3.5 h-3.5 group-hover:rotate-12 transition-transform" />
       <span>تصفّح بالكومة</span>
-      <span className="text-[10px] bg-white/20 px-2 py-0.5 rounded-full font-medium">
-        Tinder Style
-      </span>
+      <ArrowLeft className="w-3 h-3 group-hover:translate-x-[-2px] transition-transform" />
     </Link>
   );
 }
