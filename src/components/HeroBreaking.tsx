@@ -6,20 +6,19 @@ import type { Article } from '@/lib/db/schema';
 import { CATEGORY_LABELS, arabicTimeAgo, readTime, toArabicNum } from '@/lib/utils';
 
 /**
- * هيرو ورقي مدمج — أسلوب صحفي راقٍ بمساحة معقولة:
- *   • صورة مربّعة جانبية (مش عملاقة)
- *   • شارة "خبر اليوم" ذهبية صغيرة
- *   • العنوان متوسط
- *   • السطر ٢ و٣ inline
+ * هيرو شريط أفقي مدمج — لا يستهلك الواجهة:
+ *   • صورة مربعة 140×140 على الجنب
+ *   • العنوان + السطر ٢ و٣ في عمود مضغوط
+ *   • ارتفاع كامل ≤ 150px على الديسكتوب
  */
 export default function HeroBreaking({ article }: { article: Article }) {
   const seconds = readTime(article.line1, article.line2, article.line3);
 
   return (
-    <article className="relative mb-7 satr-card overflow-hidden">
+    <article className="relative mb-7 satr-card overflow-hidden md:max-h-[150px]">
       <div className="grid grid-cols-1 md:grid-cols-12">
-        {/* الصورة - أصغر بكثير */}
-        <div className="relative h-40 md:h-auto md:col-span-4 md:order-2 bg-[var(--accent-wash)] overflow-hidden md:min-h-[200px]">
+        {/* الصورة - مربع صغير */}
+        <div className="relative h-32 md:h-[150px] md:col-span-3 md:order-2 bg-[var(--accent-wash)] overflow-hidden">
           {article.imageUrl ? (
             <>
               {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -28,29 +27,29 @@ export default function HeroBreaking({ article }: { article: Article }) {
                 alt={article.imageAlt || article.line1}
                 className="w-full h-full object-cover"
               />
-              <span aria-hidden className="md:hidden absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-[var(--paper)] to-transparent" />
+              <span aria-hidden className="md:hidden absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-[var(--paper)] to-transparent" />
             </>
           ) : (
             <div className="w-full h-full flex items-center justify-center bg-[var(--paper-tinted)]">
-              <div className="flex flex-col gap-2 px-8">
-                <span className="h-1 w-24 rounded-full bg-[var(--accent)] opacity-80" />
-                <span className="h-1 w-20 rounded-full bg-[var(--accent-soft)] opacity-60" />
-                <span className="h-1 w-22 rounded-full bg-[var(--accent-light)]" />
+              <div className="flex flex-col gap-1.5 px-6">
+                <span className="h-1 w-16 rounded-full bg-[var(--accent)] opacity-80" />
+                <span className="h-1 w-12 rounded-full bg-[var(--accent-soft)] opacity-60" />
+                <span className="h-1 w-14 rounded-full bg-[var(--accent-light)]" />
               </div>
             </div>
           )}
 
           {article.isBreaking && (
-            <div className="absolute bottom-2.5 right-2.5">
+            <div className="absolute bottom-2 right-2">
               <span className="breaking-badge">عاجل</span>
             </div>
           )}
         </div>
 
         {/* النص */}
-        <div className="p-5 md:p-6 md:col-span-8 md:order-1 flex flex-col justify-center bg-[var(--paper)]">
+        <div className="px-5 py-4 md:px-6 md:py-4 md:col-span-9 md:order-1 flex flex-col justify-center bg-[var(--paper)] min-w-0">
           {/* meta علوي + شارة خبر اليوم */}
-          <div className="flex items-center flex-wrap gap-x-2 gap-y-1 mb-3">
+          <div className="flex items-center flex-wrap gap-x-2 gap-y-0.5 mb-2">
             <span className="inline-flex items-center gap-1 text-[9.5px] font-bold tracking-[0.18em] uppercase text-[var(--gold)]">
               <span className="w-1 h-1 rounded-full bg-[var(--gold)]" />
               خبر اليوم
@@ -70,31 +69,37 @@ export default function HeroBreaking({ article }: { article: Article }) {
             </span>
           </div>
 
-          {/* العنوان (السطر الأول) - متوسط */}
-          <h2 className="text-[1.125rem] md:text-[1.375rem] font-black leading-[1.25] text-[var(--ink)] mb-3 tracking-tight">
-            {article.line1}
-          </h2>
+          {/* العنوان (السطر الأول) */}
+          <Link
+            href={`/article/${article.id}`}
+            className="block group"
+          >
+            <h2 className="text-[15px] md:text-[17px] font-black leading-snug text-[var(--ink)] mb-1.5 tracking-tight line-clamp-1 group-hover:text-[var(--accent)] transition-colors">
+              {article.line1}
+            </h2>
+          </Link>
 
-          {/* السطر ٢ و٣ */}
-          <div className="space-y-1.5 mb-4 pr-2.5 border-r-2 border-[var(--accent-light)]">
-            <p className="text-[13px] md:text-[13.5px] font-medium leading-relaxed text-[var(--ink-soft)] line-clamp-2">
+          {/* السطر ٢ و٣ — كل واحد سطر واحد فقط */}
+          <div className="space-y-1 pr-2 border-r-2 border-[var(--accent-light)]">
+            <p className="text-[12.5px] md:text-[13px] font-medium leading-snug text-[var(--ink-soft)] line-clamp-1">
               {article.line2}
             </p>
-            <p className="text-[13px] md:text-[13.5px] font-bold italic leading-relaxed text-[var(--accent)] line-clamp-2">
+            <p className="text-[12.5px] md:text-[13px] font-bold italic leading-snug text-[var(--accent)] line-clamp-1">
               {article.line3}
             </p>
           </div>
-
-          {/* CTA */}
-          <Link
-            href={`/article/${article.id}`}
-            className="self-start inline-flex items-center gap-1.5 text-[10.5px] font-bold tracking-[0.15em] uppercase text-[var(--accent)] hover:gap-2 transition-all group"
-          >
-            <span>اقرأ التفاصيل</span>
-            <ArrowLeft className="w-3 h-3 group-hover:translate-x-[-2px] transition-transform" />
-          </Link>
         </div>
       </div>
+
+      {/* CTA كزر مدمج في الزاوية - لا يأخذ ارتفاعاً */}
+      <Link
+        href={`/article/${article.id}`}
+        aria-label={`اقرأ التفاصيل: ${article.line1}`}
+        className="absolute bottom-2.5 left-3 hidden md:inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[var(--accent-wash)] text-[10px] font-bold tracking-wider uppercase text-[var(--accent)] hover:bg-[var(--accent)] hover:text-white transition-all group"
+      >
+        <span>التفاصيل</span>
+        <ArrowLeft className="w-3 h-3 group-hover:translate-x-[-2px] transition-transform" />
+      </Link>
     </article>
   );
 }
