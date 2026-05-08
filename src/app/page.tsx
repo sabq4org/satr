@@ -5,7 +5,6 @@ import Footer from '@/components/Footer';
 import ArticleCard from '@/components/ArticleCard';
 import HeroBreaking from '@/components/HeroBreaking';
 import LiveBar from '@/components/LiveBar';
-import StackButton from '@/components/StackButton';
 import TodaysPulse from '@/components/TodaysPulse';
 import EmptyState from '@/components/EmptyState';
 import { isOffline, currentEngine, currentModel } from '@/lib/ai';
@@ -78,29 +77,8 @@ export default async function HomePage() {
 
         {totalCount > 0 ? (
           <>
-            {/* نبض اليوم — التحية + الإحصائيات الإبداعية */}
+            {/* نبض اليوم — تاريخ + عنوان + ميتا إحصائية + كومة */}
             <TodaysPulse articles={latest} breakingCount={breaking.length} />
-
-            {/* صف العنوان + زر الكومة */}
-            <div className="mb-8 flex flex-col md:flex-row md:items-end md:justify-between gap-4">
-              <div>
-                <p className="text-xs font-bold text-[var(--accent)] tracking-widest uppercase mb-2">
-                  {new Intl.DateTimeFormat('ar-SA', {
-                    weekday: 'long',
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric',
-                  }).format(new Date())}
-                </p>
-                <h1 className="headline-display text-3xl md:text-5xl mb-2 text-[var(--ink)]">
-                  الموجز اليومي
-                </h1>
-                <p className="text-[var(--ink-soft)] text-sm md:text-base">
-                  {toArabicNum(totalCount)} {totalCount === 1 ? 'خبر' : 'خبراً'} مكثّفاً بعناية. كل خبر في ٣ سطور — لا أكثر.
-                </p>
-              </div>
-              <StackButton />
-            </div>
 
             {/* البطاقة المميزة (Hero) */}
             {featured[0] && <HeroBreaking article={featured[0]} />}
