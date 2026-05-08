@@ -205,7 +205,7 @@ export default async function ArticlePage({ params }: Props) {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               {related.map((a) => (
-                <ArticleCard key={a.id} article={a} variant="default" />
+                <ArticleCard key={a.id} article={a} />
               ))}
             </div>
           </section>
