@@ -81,11 +81,11 @@ export default async function HomePage() {
             {/* نبض اليوم — التحية + الميتا + كلمة اليوم + زر الكومة */}
             <TodaysPulse articles={latest} breakingCount={breaking.length} />
 
+            {/* الهيرو السينمائي — الصورة فوراً */}
+            {featured[0] && <HeroBreaking article={featured[0]} />}
+
             {/* عناوين سريعة - "اقرأ نبضة اليوم في ٣٠ ثانية" */}
             <HeadlineTicker articles={latest} />
-
-            {/* الهيرو الورقي */}
-            {featured[0] && <HeroBreaking article={featured[0]} />}
 
             {/* الأكثر قراءة — رقيق */}
             {trending.some((a) => (a.views || 0) > 0) && (
@@ -130,25 +130,63 @@ export default async function HomePage() {
   );
 }
 
-// بطاقة الأكثر قراءة - رقيقة جداً
+// بطاقة الأكثر قراءة — صورة + رقم ضخم + سطر العنوان
 function RankedCard({ article, rank }: { article: typeof articles.$inferSelect; rank: number }) {
+  const accent = `var(--${article.category})`;
   return (
     <a
       href={`/article/${article.id}`}
-      className="paper-card p-4 flex gap-3 group hover:border-[var(--accent)]"
+      className="paper-card overflow-hidden flex flex-col group hover:-translate-y-0.5 transition-transform"
     >
-      <div className="flex-shrink-0">
-        <span className="block stat-num text-[2rem] text-[var(--accent-light)] group-hover:text-[var(--accent)] transition-colors leading-none">
-          {toArabicNum(String(rank).padStart(2, '0'))}
+      {/* صورة عريضة مع رقم متراكب */}
+      <div className="relative h-28 overflow-hidden bg-gradient-to-br from-[var(--accent-tint)] to-[var(--accent-wash)]">
+        {article.imageUrl ? (
+          <>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={article.imageUrl}
+              alt=""
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+              loading="lazy"
+            />
+            <span aria-hidden className="absolute inset-0 bg-gradient-to-t from-black/35 to-transparent" />
+          </>
+        ) : (
+          <div className="w-full h-full flex items-center justify-center" style={{ background: `linear-gradient(135deg, ${accent}, var(--accent-deep))` }}>
+            <span className="text-white/40 text-[42px] font-black tnum select-none">
+              {toArabicNum(rank)}
+            </span>
+          </div>
+        )}
+        {/* رقم الترتيب — ضخم ومتوهج */}
+        <span
+          aria-hidden
+          className="absolute -bottom-1 right-3 text-[58px] font-black leading-none tnum text-white drop-shadow-md"
+          style={{ WebkitTextStroke: '1.5px rgba(0,0,0,0.15)' }}
+        >
+          {toArabicNum(rank)}
         </span>
+        {/* شريط لون القسم */}
+        <span aria-hidden className="absolute top-0 right-0 bottom-0 w-[3px]" style={{ background: accent }} />
       </div>
-      <div className="flex-1 min-w-0">
-        <p className="font-bold text-[13.5px] text-[var(--ink)] line-clamp-3 leading-relaxed group-hover:text-[var(--accent)] transition-colors">
+
+      <div className="p-3.5 flex-1 flex flex-col">
+        <p className="font-bold text-[13px] text-[var(--ink)] line-clamp-2 leading-snug group-hover:text-[var(--accent)] transition-colors mb-2 flex-1">
           {article.line1}
         </p>
-        <p className="text-[10.5px] text-[var(--ink-faint)] mt-2 tnum">
-          {toArabicNum((article.views || 0).toLocaleString('ar-SA'))} مشاهدة
-        </p>
+        <div className="flex items-center justify-between text-[10px] text-[var(--ink-faint)]">
+          <span className="font-semibold tracking-wider uppercase" style={{ color: accent }}>
+            {article.category === 'local' ? 'محلي' :
+             article.category === 'world' ? 'عالمي' :
+             article.category === 'economy' ? 'اقتصاد' :
+             article.category === 'sport' ? 'رياضة' :
+             article.category === 'tech' ? 'تقنية' :
+             article.category === 'culture' ? 'ثقافة' : 'منوعات'}
+          </span>
+          <span className="tnum">
+            {toArabicNum((article.views || 0).toLocaleString('ar-SA'))} مشاهدة
+          </span>
+        </div>
       </div>
     </a>
   );

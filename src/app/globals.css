@@ -138,9 +138,9 @@ body::after {
 }
 
 .satr-card:hover {
-  box-shadow: var(--shadow-paper);
-  transform: translateY(-1px);
-  border-color: var(--border);
+  box-shadow: var(--shadow-lifted);
+  transform: translateY(-3px);
+  border-color: var(--accent-light);
 }
 
 /* بطاقة "ورقة" — للحظات أكثر هدوءاً */
@@ -571,4 +571,25 @@ body::after {
 /* انتقالات الأقسام */
 .section-fade {
   animation: fade-in-up 0.6s cubic-bezier(0.2, 0, 0, 1) both;
+}
+
+/* وميض ذهبي لطيف لشارات احتفالية */
+@keyframes shine-gold {
+  0%, 100% { box-shadow: 0 2px 6px rgba(184, 137, 58, 0.25), 0 0 0 0 rgba(184, 137, 58, 0.35); }
+  50% { box-shadow: 0 4px 12px rgba(184, 137, 58, 0.35), 0 0 0 4px rgba(184, 137, 58, 0); }
+}
+
+.shine-gold {
+  animation: shine-gold 3s ease-in-out infinite;
+}
+
+/* خلفية شريطية للنبض اليومي - ضوء يتنقّل */
+@keyframes ambient-shift {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(8px, -4px) scale(1.05); }
+  66% { transform: translate(-6px, 6px) scale(0.95); }
+}
+
+.ambient-blob {
+  animation: ambient-shift 14s ease-in-out infinite;
 }

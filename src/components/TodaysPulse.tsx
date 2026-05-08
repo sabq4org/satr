@@ -1,6 +1,6 @@
-import { Zap, Hash } from 'lucide-react';
+import { Zap, Hash, Newspaper, Clock3 } from 'lucide-react';
 import Link from 'next/link';
-import { CATEGORY_LABELS, toArabicNum, totalReadTime, arabicGreeting } from '@/lib/utils';
+import { CATEGORY_LABELS, CATEGORY_EMOJI, toArabicNum, totalReadTime, arabicGreeting } from '@/lib/utils';
 import type { Article, Category } from '@/lib/db/schema';
 import StackButton from './StackButton';
 
@@ -10,29 +10,27 @@ interface Props {
 }
 
 /**
- * شريط افتتاحي ناعم — يدمج كل سياق اليوم بأسلوب صحفي راقٍ.
- *
- * المكونات الإبداعية:
- *   • تحية حسب الوقت (تتجدد ديناميكياً)
- *   • تاريخ صحفي
- *   • العنوان الكبير
- *   • سطر ميتا inline (إجمالي · زمن · عاجل · القسم الأبرز)
- *   • "كلمة اليوم" — أكثر وسم تكراراً مع رابط مباشر
- *   • زر الكومة على الجنب
+ * شريط افتتاحي حيوي بإيقاع مجلة:
+ *  • خلفية بنفحة لونية + زخرفة هندسية
+ *  • أرقام ضخمة ملوّنة
+ *  • مواضيع رائجة كشيبس ملوّنة
+ *  • كلمة اليوم
+ *  • زر الكومة
  */
 export default function TodaysPulse({ articles, breakingCount }: Props) {
   const total = articles.length;
   if (total === 0) return null;
 
-  // أكثر تصنيف
+  // حساب التوزيع حسب الأقسام
   const catCounts: Record<string, number> = {};
   articles.forEach((a) => {
     catCounts[a.category] = (catCounts[a.category] || 0) + 1;
   });
-  const topCatEntry = Object.entries(catCounts).sort((a, b) => b[1] - a[1])[0];
-  const topCategory = topCatEntry?.[0] as Category | undefined;
+  const sortedCats = Object.entries(catCounts)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 5) as [Category, number][];
 
-  // كلمة اليوم — أكثر وسم تكراراً
+  // كلمة اليوم
   const tagCounts: Record<string, number> = {};
   articles.forEach((a) => {
     (a.tags || []).forEach((t) => {
@@ -54,83 +52,136 @@ export default function TodaysPulse({ articles, breakingCount }: Props) {
   return (
     <section
       aria-label="نبض اليوم"
-      className="mb-7 pb-6 border-b border-[var(--border-soft)]"
+      className="relative mb-7 overflow-hidden rounded-3xl bg-gradient-to-bl from-[var(--accent-tint)] via-[var(--paper)] to-[var(--paper)] border border-[var(--border)]"
     >
-      <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-5">
-        <div className="min-w-0 flex-1">
-          {/* تحية + تاريخ */}
-          <p className="text-[10.5px] font-bold tracking-[0.22em] uppercase text-[var(--accent)] mb-2.5 flex items-center flex-wrap gap-x-2 gap-y-0.5">
-            <span className="inline-flex items-center gap-1.5 opacity-90">
-              <span aria-hidden>{greeting.emoji}</span>
-              <span>{greeting.greeting}</span>
-            </span>
-            <span aria-hidden className="w-1 h-1 rounded-full bg-[var(--ink-faint)]" />
-            <span className="text-[var(--ink-soft)] font-semibold tracking-widest">{today}</span>
-          </p>
+      {/* زخرفة هندسية متحركة في الخلفية */}
+      <div aria-hidden className="ambient-blob absolute -top-12 -left-12 w-56 h-56 rounded-full bg-[var(--accent-light)] opacity-30 blur-3xl pointer-events-none" />
+      <div aria-hidden className="ambient-blob absolute top-1/2 right-0 w-40 h-40 rounded-full bg-[var(--gold-soft)] opacity-25 blur-3xl pointer-events-none" style={{ animationDelay: '7s' }} />
 
-          {/* العنوان */}
-          <h1 className="headline-display text-[2rem] md:text-[2.5rem] text-[var(--ink)] mb-3.5">
-            الموجز اليومي
-          </h1>
-
-          {/* ميتا إحصائية - سطر واحد inline */}
-          <p className="flex flex-wrap items-center gap-x-2.5 gap-y-1.5 text-[13.5px] text-[var(--ink-soft)] leading-relaxed">
-            <span className="text-[var(--ink)]">
-              <strong className="font-black tnum">{toArabicNum(total)}</strong>{' '}
-              {total === 1 ? 'خبر' : 'خبراً'}
-            </span>
-            <span aria-hidden className="text-[var(--ink-whisper)]">/</span>
-            <span>
-              تقرأها في{' '}
-              <strong className="font-bold text-[var(--accent)] tnum">{totalTime}</strong>
-            </span>
-            {breakingCount > 0 && (
-              <>
-                <span aria-hidden className="text-[var(--ink-whisper)]">/</span>
-                <span className="inline-flex items-center gap-1 text-[var(--breaking)]">
-                  <Zap className="w-3 h-3 fill-current" />
-                  <strong className="font-bold tnum">{toArabicNum(breakingCount)}</strong> عاجل
-                </span>
-              </>
-            )}
-            {topCategory && (
-              <>
-                <span aria-hidden className="text-[var(--ink-whisper)]">/</span>
-                <span>
-                  أبرز قسم{' '}
-                  <Link
-                    href={`/category/${topCategory}`}
-                    className="font-bold text-[var(--ink)] hover:text-[var(--accent)] transition-colors"
-                  >
-                    {CATEGORY_LABELS[topCategory]}
-                  </Link>
-                </span>
-              </>
-            )}
-          </p>
-
-          {/* كلمة اليوم */}
-          {wordOfDay && wordOfDayCount > 1 && (
-            <Link
-              href={`/tag/${encodeURIComponent(wordOfDay)}`}
-              className="mt-3.5 inline-flex items-center gap-2 text-xs text-[var(--ink-faint)] hover:text-[var(--accent)] transition-colors group"
-            >
-              <span className="font-bold tracking-widest uppercase text-[10px]">كلمة اليوم</span>
-              <span aria-hidden className="w-3 h-px bg-current opacity-50" />
-              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[var(--accent-wash)] text-[var(--accent)] font-bold group-hover:bg-[var(--accent)] group-hover:text-white transition-all">
-                <Hash className="w-3 h-3" />
-                <span>{wordOfDay}</span>
-                <span className="text-[10px] opacity-70 tnum">{toArabicNum(wordOfDayCount)}</span>
-              </span>
-            </Link>
-          )}
+      <div className="relative p-5 md:p-7">
+        {/* تحية + تاريخ */}
+        <div className="flex items-center flex-wrap gap-x-2 gap-y-1 mb-3">
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[var(--paper)] border border-[var(--border-soft)] text-[10.5px] font-bold tracking-[0.18em] uppercase text-[var(--accent)]">
+            <span aria-hidden>{greeting.emoji}</span>
+            <span>{greeting.greeting}</span>
+          </span>
+          <span className="text-[11px] font-semibold tracking-widest text-[var(--ink-soft)] tnum">
+            {today}
+          </span>
         </div>
 
-        {/* زر الكومة */}
-        <div className="md:flex-shrink-0 self-start md:self-end">
+        {/* العنوان مع لمعة */}
+        <h1 className="headline-display text-[2rem] md:text-[2.5rem] text-[var(--ink)] mb-4 leading-[1.05]">
+          الموجز{' '}
+          <span className="relative inline-block">
+            <span className="relative z-10">اليومي</span>
+            <span aria-hidden className="absolute inset-x-0 bottom-1.5 h-2.5 md:h-3 bg-[var(--gold-soft)] -z-0 rounded opacity-60" />
+          </span>
+        </h1>
+
+        {/* أرقام ضخمة في صف */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5">
+          <StatBadge
+            icon={<Newspaper className="w-3.5 h-3.5" />}
+            value={toArabicNum(total)}
+            label={total === 1 ? 'خبر' : 'خبراً'}
+            tone="accent"
+          />
+          <StatBadge
+            icon={<Clock3 className="w-3.5 h-3.5" />}
+            value={totalTime}
+            label="زمن القراءة"
+            tone="ink"
+          />
+          <StatBadge
+            icon={<Zap className="w-3.5 h-3.5 fill-current" />}
+            value={toArabicNum(breakingCount)}
+            label={breakingCount === 1 ? 'عاجل' : 'عاجل'}
+            tone="breaking"
+            href={breakingCount > 0 ? '#latest' : undefined}
+          />
+          <StatBadge
+            icon={<Hash className="w-3.5 h-3.5" />}
+            value={wordOfDay ? `#${wordOfDay}` : '—'}
+            label={wordOfDay ? `${toArabicNum(wordOfDayCount)} ربط` : 'كلمة اليوم'}
+            tone="gold"
+            href={wordOfDay ? `/tag/${encodeURIComponent(wordOfDay)}` : undefined}
+            small
+          />
+        </div>
+
+        {/* شريط مواضيع رائجة + زر الكومة */}
+        <div className="flex items-center justify-between gap-3 flex-wrap">
+          <div className="flex items-center gap-2 flex-wrap min-w-0">
+            <span className="text-[10px] font-bold tracking-[0.18em] uppercase text-[var(--ink-faint)]">
+              رائج
+            </span>
+            <div className="flex items-center gap-1.5 flex-wrap">
+              {sortedCats.map(([cat, count]) => (
+                <Link
+                  key={cat}
+                  href={`/category/${cat}`}
+                  className="group inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11.5px] font-bold transition-all hover:-translate-y-0.5"
+                  style={{
+                    background: `var(--${cat})`,
+                    color: 'white',
+                    opacity: 0.92,
+                  }}
+                >
+                  <span aria-hidden className="text-[10px]">{CATEGORY_EMOJI[cat]}</span>
+                  <span>{CATEGORY_LABELS[cat]}</span>
+                  <span className="opacity-75 tnum text-[10px]">{toArabicNum(count)}</span>
+                </Link>
+              ))}
+            </div>
+          </div>
           <StackButton />
         </div>
       </div>
     </section>
   );
+}
+
+function StatBadge({
+  icon,
+  value,
+  label,
+  tone,
+  href,
+  small,
+}: {
+  icon: React.ReactNode;
+  value: string;
+  label: string;
+  tone: 'accent' | 'ink' | 'breaking' | 'gold';
+  href?: string;
+  small?: boolean;
+}) {
+  const toneClasses: Record<string, string> = {
+    accent: 'text-[var(--accent)]',
+    ink: 'text-[var(--ink)]',
+    breaking: 'text-[var(--breaking)]',
+    gold: 'text-[var(--gold)]',
+  };
+
+  const content = (
+    <div className="paper-card px-3.5 py-2.5 flex items-center gap-2.5 group hover:border-[var(--accent-light)] transition-colors">
+      <span className={`flex-shrink-0 ${toneClasses[tone]} opacity-70 group-hover:opacity-100 transition-opacity`}>
+        {icon}
+      </span>
+      <div className="flex-1 min-w-0">
+        <div
+          className={`font-black ${toneClasses[tone]} tnum leading-tight tracking-tight truncate ${small ? 'text-[15px]' : 'text-xl md:text-[1.5rem]'}`}
+        >
+          {value}
+        </div>
+        <div className="text-[10px] font-bold tracking-wider uppercase text-[var(--ink-faint)] truncate">
+          {label}
+        </div>
+      </div>
+    </div>
+  );
+
+  if (href) return <Link href={href}>{content}</Link>;
+  return content;
 }

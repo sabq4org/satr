@@ -91,49 +91,77 @@ export default function ArticleCard({ article, variant = 'default' }: Props) {
         <span className="sr-only">{article.line1}</span>
       </Link>
 
-      {/* الصورة */}
+      {/* الصورة — أبرز ومع بادج قسم متراكب */}
       {article.imageUrl && variant !== 'compact' && (
         <div
           className={cn(
-            'relative w-full overflow-hidden bg-[var(--accent-wash)]',
-            variant === 'featured' ? 'h-64 md:h-80' : 'h-44',
+            'relative w-full overflow-hidden',
+            variant === 'featured' ? 'h-64 md:h-80' : 'h-48',
           )}
+          style={{ background: `linear-gradient(135deg, var(--${article.category}) 0%, var(--accent-deep) 100%)` }}
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={article.imageUrl}
             alt={article.imageAlt || article.line1}
-            className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-[800ms] ease-out"
+            className="w-full h-full object-cover group-hover:scale-[1.05] transition-transform duration-[900ms] ease-out"
             loading="lazy"
           />
-          <span aria-hidden className="absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-black/25 to-transparent" />
+          <span aria-hidden className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/55 via-black/15 to-transparent" />
+
+          {/* قسم على الصورة */}
+          <span
+            className="absolute top-3 right-3 inline-flex items-center px-2 py-1 rounded-full text-[10px] font-black tracking-[0.18em] uppercase text-white backdrop-blur-sm shadow-md"
+            style={{ background: `color-mix(in oklab, var(--${article.category}) 88%, transparent)` }}
+          >
+            {CATEGORY_LABELS[article.category]}
+          </span>
 
           {article.isBreaking && (
-            <div className="absolute top-3 right-3">
+            <div className="absolute top-3 left-3">
               <span className="breaking-badge">عاجل</span>
             </div>
           )}
+
+          {/* وقت القراءة على الصورة */}
+          <span className="absolute bottom-3 left-3 inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-black/45 backdrop-blur-sm text-white text-[10.5px] font-bold tnum">
+            <Clock3 className="w-2.5 h-2.5" />
+            {toArabicNum(seconds)} ث
+          </span>
         </div>
       )}
 
       <div className="p-5 md:p-6 relative">
-        {/* السطر العلوي: التصنيف + الوقت + وقت القراءة */}
+        {/* السطر العلوي: مبسّط لأن القسم/وقت القراءة على الصورة */}
         <div className="flex items-center justify-between mb-4 text-xs gap-2 flex-wrap">
           <div className="flex items-center gap-2">
-            <span className={`cat-badge cat-${article.category}`}>
-              {CATEGORY_LABELS[article.category]}
-            </span>
+            {/* عرض القسم نصياً فقط إذا لا توجد صورة */}
+            {!article.imageUrl && (
+              <span className={`cat-badge cat-${article.category}`}>
+                {CATEGORY_LABELS[article.category]}
+              </span>
+            )}
             {article.isBreaking && !article.imageUrl && (
               <span className="breaking-badge">عاجل</span>
             )}
+            {fresh && (
+              <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-[var(--breaking)]">
+                <span className="w-1 h-1 rounded-full bg-current animate-pulse" />
+                جديد
+              </span>
+            )}
           </div>
           <div className="flex items-center gap-2 text-[var(--ink-faint)]">
-            <span className="read-time" title="وقت القراءة التقريبي">
-              <Clock3 className="w-3 h-3" />
-              {toArabicNum(seconds)}ث
-            </span>
-            <span aria-hidden className="w-px h-3 bg-[var(--border)]" />
-            <span className="text-[11px] tnum">
+            {!article.imageUrl && (
+              <>
+                <span className="read-time" title="وقت القراءة التقريبي">
+                  <Clock3 className="w-3 h-3" />
+                  {toArabicNum(seconds)}ث
+                </span>
+                <span aria-hidden className="w-px h-3 bg-[var(--border)]" />
+              </>
+            )}
+            <span className="text-[11px] tnum font-semibold">
               {arabicTimeAgo(article.publishedAt || article.createdAt)}
             </span>
           </div>
