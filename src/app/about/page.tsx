@@ -1,4 +1,5 @@
 import Header from '@/components/Header';
+import Footer from '@/components/Footer';
 import Link from 'next/link';
 import { ArrowLeft, Sparkles, Code2 } from 'lucide-react';
 
@@ -70,6 +71,7 @@ export default function AboutPage() {
           </Link>
         </div>
       </main>
+      <Footer />
     </>
   );
 }

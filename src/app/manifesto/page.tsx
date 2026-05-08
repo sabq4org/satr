@@ -1,4 +1,5 @@
 import Header from '@/components/Header';
+import Footer from '@/components/Footer';
 import Link from 'next/link';
 import { Sparkles } from 'lucide-react';
 
@@ -107,12 +108,13 @@ export default function ManifestoPage() {
         <div className="text-center">
           <Link
             href="/"
-            className="inline-flex items-center gap-2 px-6 py-3 bg-[var(--accent)] text-white rounded-full font-bold hover:bg-[var(--accent-soft)] transition-colors"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-[var(--accent)] text-white rounded-full font-bold hover:bg-[var(--accent-deep)] transition-colors"
           >
             ابدأ القراءة
           </Link>
         </div>
       </main>
+      <Footer />
     </>
   );
 }

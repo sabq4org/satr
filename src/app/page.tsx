@@ -1,12 +1,16 @@
 import { db, articles } from '@/lib/db';
 import { desc, eq, and, gte } from 'drizzle-orm';
 import Header from '@/components/Header';
+import Footer from '@/components/Footer';
 import ArticleCard from '@/components/ArticleCard';
 import HeroBreaking from '@/components/HeroBreaking';
 import LiveBar from '@/components/LiveBar';
 import StackButton from '@/components/StackButton';
+import TodaysPulse from '@/components/TodaysPulse';
+import EmptyState from '@/components/EmptyState';
 import { isOffline, currentEngine, currentModel } from '@/lib/ai';
-import { Cpu, WifiOff, TrendingUp, Clock, Layers } from 'lucide-react';
+import { toArabicNum } from '@/lib/utils';
+import { Cpu, WifiOff, TrendingUp, Clock, Flame } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 
@@ -48,7 +52,7 @@ export default async function HomePage() {
 
   return (
     <>
-      <Header />
+      <Header active="home" />
 
       {/* شريط العاجل (إن وجد) */}
       {breaking.length > 0 && <LiveBar items={breaking} />}
@@ -72,142 +76,96 @@ export default async function HomePage() {
           </div>
         )}
 
-        {/* العنوان مع تاريخ ودعوة الكومة */}
-        <div className="mb-8 flex flex-col md:flex-row md:items-end md:justify-between gap-4">
-          <div>
-            <p className="text-xs font-bold text-[var(--accent)] tracking-widest uppercase mb-2">
-              {new Intl.DateTimeFormat('ar-SA', {
-                weekday: 'long',
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-              }).format(new Date())}
-            </p>
-            <h1 className="text-3xl md:text-5xl font-black text-[var(--ink)] mb-2 tracking-tight">
-              الموجز اليومي
-            </h1>
-            <p className="text-[var(--ink-soft)] text-sm md:text-base">
-              {totalCount} خبر مختصر بعناية. كل خبر في ٣ سطور — لا أكثر.
-            </p>
-          </div>
-          <StackButton />
-        </div>
-
-        {/* البطاقة المميزة (Hero) */}
-        {featured[0] && <HeroBreaking article={featured[0]} />}
-
-        {/* بقية المميزة */}
-        {featured.length > 1 && (
+        {totalCount > 0 ? (
           <>
+            {/* نبض اليوم — التحية + الإحصائيات الإبداعية */}
+            <TodaysPulse articles={latest} breakingCount={breaking.length} />
+
+            {/* صف العنوان + زر الكومة */}
+            <div className="mb-8 flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+              <div>
+                <p className="text-xs font-bold text-[var(--accent)] tracking-widest uppercase mb-2">
+                  {new Intl.DateTimeFormat('ar-SA', {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                  }).format(new Date())}
+                </p>
+                <h1 className="headline-display text-3xl md:text-5xl mb-2 text-[var(--ink)]">
+                  الموجز اليومي
+                </h1>
+                <p className="text-[var(--ink-soft)] text-sm md:text-base">
+                  {toArabicNum(totalCount)} {totalCount === 1 ? 'خبر' : 'خبراً'} مكثّفاً بعناية. كل خبر في ٣ سطور — لا أكثر.
+                </p>
+              </div>
+              <StackButton />
+            </div>
+
+            {/* البطاقة المميزة (Hero) */}
+            {featured[0] && <HeroBreaking article={featured[0]} />}
+
+            {/* بقية المميزة */}
+            {featured.length > 1 && (
+              <>
+                <section className="section-divider">
+                  <h2 className="flex items-center gap-2">
+                    <TrendingUp className="w-5 h-5 text-[var(--accent)]" />
+                    أبرز ما تأخذه
+                  </h2>
+                </section>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mb-12">
+                  {featured.slice(1).map((article) => (
+                    <ArticleCard key={article.id} article={article} />
+                  ))}
+                </div>
+              </>
+            )}
+
+            {/* الترند */}
+            {trending.some((a) => (a.views || 0) > 0) && (
+              <>
+                <section className="section-divider">
+                  <h2 className="flex items-center gap-2">
+                    <Flame className="w-5 h-5 text-[var(--breaking)]" />
+                    الأكثر قراءة
+                  </h2>
+                </section>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-12">
+                  {trending.map((article, i) => (
+                    <RankedCard key={article.id} article={article} rank={i + 1} />
+                  ))}
+                </div>
+              </>
+            )}
+
+            {/* أحدث */}
             <section className="section-divider">
               <h2 className="flex items-center gap-2">
-                <TrendingUp className="w-5 h-5 text-[var(--accent)]" />
-                أبرز ما تأخذه
+                <Clock className="w-5 h-5 text-[var(--accent)]" />
+                تتابع الأخبار
               </h2>
             </section>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mb-12">
-              {featured.slice(1).map((article) => (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+              {latestFiltered.map((article) => (
                 <ArticleCard key={article.id} article={article} />
               ))}
             </div>
           </>
+        ) : (
+          <EmptyState
+            title="لا توجد أخبار منشورة بعد"
+            description="سطر يقدّم كل خبر في ٣ سطور — الحدث، السياق، المعنى. أول الأخبار قادم. اكتشف فلسفتنا التحريرية في انتظار الموجز."
+            ctaHref="/manifesto"
+            ctaLabel="اقرأ قاعدة الـ٣"
+          />
         )}
-
-        {/* الترند */}
-        {trending.some((a) => (a.views || 0) > 0) && (
-          <>
-            <section className="section-divider">
-              <h2 className="flex items-center gap-2">
-                <span className="text-xl">🔥</span>
-                الأكثر قراءة
-              </h2>
-            </section>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-12">
-              {trending.map((article, i) => (
-                <RankedCard key={article.id} article={article} rank={i + 1} />
-              ))}
-            </div>
-          </>
-        )}
-
-        {/* أحدث */}
-        <section className="section-divider">
-          <h2 className="flex items-center gap-2">
-            <Clock className="w-5 h-5 text-[var(--accent)]" />
-            تتابع الأخبار
-          </h2>
-        </section>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {latestFiltered.map((article) => (
-            <ArticleCard key={article.id} article={article} />
-          ))}
-        </div>
-
-        {latest.length === 0 && (
-          <div className="text-center py-20">
-            <p className="text-[var(--ink-soft)] text-lg mb-2">لا توجد أخبار منشورة بعد.</p>
-            <p className="text-[var(--ink-faint)] text-sm">سجل دخولك من لوحة التحرير لإضافة أول خبر.</p>
-          </div>
-        )}
-
-        {/* Footer */}
-        <footer className="mt-24 pt-10 border-t border-[var(--border)]">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
-            <div>
-              <p className="font-black text-[var(--accent)] text-2xl mb-2">سطر</p>
-              <p className="text-sm text-[var(--ink-soft)] leading-relaxed">
-                صحيفة ذكية مختصرة. كل خبر في ٣ سطور — الحدث، السياق، المعنى.
-              </p>
-            </div>
-            <div>
-              <h3 className="font-bold text-sm mb-3 text-[var(--ink)]">القراءة</h3>
-              <ul className="space-y-2 text-sm text-[var(--ink-soft)]">
-                <li>
-                  <a href="/" className="hover:text-[var(--accent)] transition-colors">
-                    الموجز اليومي
-                  </a>
-                </li>
-                <li>
-                  <a href="/stack" className="hover:text-[var(--accent)] transition-colors">
-                    عرض الكومة
-                  </a>
-                </li>
-                <li>
-                  <a href="/tags" className="hover:text-[var(--accent)] transition-colors">
-                    كل الوسوم #
-                  </a>
-                </li>
-                <li>
-                  <a href="/feed.xml" className="hover:text-[var(--accent)] transition-colors">
-                    RSS
-                  </a>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="font-bold text-sm mb-3 text-[var(--ink)]">المنهج</h3>
-              <ul className="space-y-2 text-sm text-[var(--ink-soft)]">
-                <li>
-                  <a href="/about" className="hover:text-[var(--accent)] transition-colors">
-                    من نحن
-                  </a>
-                </li>
-                <li>
-                  <a href="/manifesto" className="hover:text-[var(--accent)] transition-colors">
-                    قاعدة الـ3
-                  </a>
-                </li>
-              </ul>
-            </div>
-          </div>
-          <div className="text-center text-xs text-[var(--ink-faint)] pb-6">
-            © 2026 سطر. كل خبر في ٣ سطور.
-          </div>
-        </footer>
       </main>
+
+      <Footer />
     </>
   );
 }
@@ -219,16 +177,16 @@ function RankedCard({ article, rank }: { article: typeof articles.$inferSelect; 
       className="satr-card p-4 flex gap-3 group hover:border-[var(--accent)]"
     >
       <div className="flex-shrink-0">
-        <span className="block text-3xl font-black text-[var(--accent-light)] group-hover:text-[var(--accent)] transition-colors leading-none">
-          {String(rank).padStart(2, '0')}
+        <span className="block stat-num text-[2.5rem] text-[var(--accent-light)] group-hover:text-[var(--accent)] transition-colors leading-none">
+          {toArabicNum(String(rank).padStart(2, '0'))}
         </span>
       </div>
       <div className="flex-1 min-w-0">
         <p className="font-bold text-sm text-[var(--ink)] line-clamp-3 leading-relaxed group-hover:text-[var(--accent)] transition-colors">
           {article.line1}
         </p>
-        <p className="text-xs text-[var(--ink-faint)] mt-2">
-          {(article.views || 0).toLocaleString('ar-SA')} مشاهدة
+        <p className="text-xs text-[var(--ink-faint)] mt-2 tnum">
+          {toArabicNum((article.views || 0).toLocaleString('ar-SA'))} مشاهدة
         </p>
       </div>
     </a>

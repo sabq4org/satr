@@ -1,9 +1,12 @@
 import { db, articles } from '@/lib/db';
 import { desc, eq, and, sql } from 'drizzle-orm';
 import Header from '@/components/Header';
+import Footer from '@/components/Footer';
 import ArticleCard from '@/components/ArticleCard';
+import EmptyState from '@/components/EmptyState';
 import Link from 'next/link';
 import { Hash, ArrowRight } from 'lucide-react';
+import { toArabicNum } from '@/lib/utils';
 
 interface Props {
   params: Promise<{ name: string }>;
@@ -37,20 +40,23 @@ export default async function TagPage({ params }: Props) {
       <main className="max-w-7xl mx-auto px-4 lg:px-6 py-8">
         <div className="mb-8">
           <Link
-            href="/"
+            href="/tags"
             className="inline-flex items-center gap-2 text-sm text-[var(--ink-soft)] hover:text-[var(--accent)] mb-4 transition-colors"
           >
             <ArrowRight className="w-4 h-4" />
-            العودة للموجز
+            كل الوسوم
           </Link>
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-2xl bg-[var(--accent-light)] flex items-center justify-center text-[var(--accent)]">
-              <Hash className="w-6 h-6" />
+          <div className="flex items-center gap-4">
+            <div className="w-14 h-14 rounded-2xl bg-[var(--accent-light)] flex items-center justify-center text-[var(--accent)]">
+              <Hash className="w-7 h-7" />
             </div>
             <div>
-              <h1 className="text-3xl md:text-4xl font-black text-[var(--ink)]">{tag}</h1>
+              <p className="text-xs font-bold text-[var(--accent)] tracking-widest uppercase mb-1">
+                وسم
+              </p>
+              <h1 className="headline-display text-3xl md:text-4xl text-[var(--ink)]">{tag}</h1>
               <p className="text-sm text-[var(--ink-soft)] mt-1">
-                {list.length} {list.length === 1 ? 'خبر' : 'أخبار'} بهذا الوسم
+                {toArabicNum(list.length)} {list.length === 1 ? 'خبر' : 'خبراً'} بهذا الوسم
               </p>
             </div>
           </div>
@@ -63,11 +69,15 @@ export default async function TagPage({ params }: Props) {
             ))}
           </div>
         ) : (
-          <div className="text-center py-20 text-[var(--ink-soft)]">
-            <p>لا توجد أخبار بهذا الوسم بعد.</p>
-          </div>
+          <EmptyState
+            title={`لا أخبار بوسم #${tag}`}
+            description="جرّب وسماً آخر، أو تصفّح كل الوسوم."
+            ctaHref="/tags"
+            ctaLabel="كل الوسوم"
+          />
         )}
       </main>
+      <Footer />
     </>
   );
 }

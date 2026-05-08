@@ -1,8 +1,11 @@
 import { db, articles } from '@/lib/db';
-import { eq, sql } from 'drizzle-orm';
+import { sql } from 'drizzle-orm';
 import Header from '@/components/Header';
+import Footer from '@/components/Footer';
+import EmptyState from '@/components/EmptyState';
 import Link from 'next/link';
 import { Hash, ArrowRight } from 'lucide-react';
+import { toArabicNum } from '@/lib/utils';
 
 export const metadata = {
   title: 'كل الوسوم — سطر',
@@ -74,9 +77,12 @@ export default async function TagsIndexPage() {
               <Hash className="w-6 h-6" />
             </div>
             <div>
-              <h1 className="text-3xl md:text-4xl font-black text-[var(--ink)]">كل الوسوم</h1>
+              <p className="text-xs font-bold text-[var(--accent)] tracking-widest uppercase mb-1">
+                المعجم
+              </p>
+              <h1 className="headline-display text-3xl md:text-4xl text-[var(--ink)]">كل الوسوم</h1>
               <p className="text-sm text-[var(--ink-soft)] mt-1">
-                {total} وسم · {totalArticles} ربط بالأخبار
+                {toArabicNum(total)} وسماً · {toArabicNum(totalArticles)} ربط بالأخبار
               </p>
             </div>
           </div>
@@ -98,8 +104,8 @@ export default async function TagsIndexPage() {
                     title={`${t.count} ${t.count === 1 ? 'خبر' : 'أخبار'}`}
                   >
                     <span>#{t.tag}</span>
-                    <span className="text-[10px] font-medium text-[var(--ink-faint)]">
-                      {t.count}
+                    <span className="text-[10px] font-medium text-[var(--ink-faint)] tnum">
+                      {toArabicNum(t.count)}
                     </span>
                   </Link>
                 ))}
@@ -121,8 +127,8 @@ export default async function TagsIndexPage() {
                       <span className="text-sm font-semibold text-[var(--ink)] group-hover:text-[var(--accent)] truncate">
                         #{t.tag}
                       </span>
-                      <span className="text-xs font-bold text-[var(--ink-faint)] tabular-nums">
-                        {t.count}
+                      <span className="text-xs font-bold text-[var(--ink-faint)] tnum">
+                        {toArabicNum(t.count)}
                       </span>
                     </Link>
                   </li>
@@ -131,12 +137,15 @@ export default async function TagsIndexPage() {
             </section>
           </>
         ) : (
-          <div className="text-center py-20 text-[var(--ink-soft)]">
-            <Hash className="w-12 h-12 mx-auto mb-3 opacity-30" />
-            <p>لا توجد وسوم بعد.</p>
-          </div>
+          <EmptyState
+            title="لا توجد وسوم بعد"
+            description="عند نشر أول خبر بوسم، ستظهر سحابة الكلمات هنا — معجم سطر بصرياً."
+            ctaHref="/"
+            ctaLabel="ارجع للموجز"
+          />
         )}
       </main>
+      <Footer />
     </>
   );
 }

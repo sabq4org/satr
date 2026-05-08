@@ -6,9 +6,16 @@ import ArticleCard from '@/components/ArticleCard';
 import ShareBar from '@/components/ShareBar';
 import ReadingProgress from '@/components/ReadingProgress';
 import DeepenInline from '@/components/DeepenInline';
-import { CATEGORY_LABELS, SOURCE_TRUST_LABELS, arabicTimeAgo } from '@/lib/utils';
+import ThreeLines from '@/components/ThreeLines';
+import {
+  CATEGORY_LABELS,
+  SOURCE_TRUST_LABELS,
+  arabicTimeAgo,
+  readTime,
+  toArabicNum,
+} from '@/lib/utils';
 import Link from 'next/link';
-import { ChevronLeft, Eye, Heart, Bookmark, Calendar, Tag as TagIcon } from 'lucide-react';
+import { ChevronLeft, Eye, Calendar, Tag as TagIcon, Clock3 } from 'lucide-react';
 import type { Metadata } from 'next';
 
 interface Props {
@@ -66,19 +73,23 @@ export default async function ArticlePage({ params }: Props) {
   const trust = article.sourceTrust ? SOURCE_TRUST_LABELS[article.sourceTrust] : null;
   const url = `/article/${article.id}`;
   const fullText = `${article.line1}\n\n${article.line2}\n\n${article.line3}`;
+  const seconds = readTime(article.line1, article.line2, article.line3);
 
   return (
     <>
       <ReadingProgress />
-      <Header />
+      <Header active={article.category} />
 
       <main className="max-w-3xl mx-auto px-4 lg:px-6 py-8">
         {/* مسار التنقل */}
-        <nav className="flex items-center gap-2 text-sm text-[var(--ink-soft)] mb-6">
+        <nav
+          className="flex items-center gap-2 text-sm text-[var(--ink-soft)] mb-6"
+          aria-label="مسار التنقل"
+        >
           <Link href="/" className="hover:text-[var(--accent)] transition-colors">
             الموجز
           </Link>
-          <ChevronLeft className="w-4 h-4" />
+          <ChevronLeft className="w-4 h-4" aria-hidden />
           <Link
             href={`/category/${article.category}`}
             className="hover:text-[var(--accent)] transition-colors"
@@ -104,13 +115,13 @@ export default async function ArticlePage({ params }: Props) {
                 </div>
               )}
               {/* تدرج خفيف من الأسفل */}
-              <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/40 to-transparent" />
+              <span aria-hidden className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/40 to-transparent" />
             </div>
           )}
 
           <div className="p-6 md:p-10">
             {/* meta علوي */}
-            <div className="flex flex-wrap items-center gap-3 mb-6 text-sm">
+            <div className="flex flex-wrap items-center gap-3 mb-7 text-sm">
               <span className={`cat-badge cat-${article.category}`}>
                 {CATEGORY_LABELS[article.category]}
               </span>
@@ -123,34 +134,16 @@ export default async function ArticlePage({ params }: Props) {
               </span>
               <span className="flex items-center gap-1 text-[var(--ink-faint)]">
                 <Eye className="w-3.5 h-3.5" />
-                {(article.views || 0).toLocaleString('ar-SA')} مشاهدة
+                {toArabicNum((article.views || 0).toLocaleString('ar-SA'))} مشاهدة
+              </span>
+              <span className="read-time">
+                <Clock3 className="w-3 h-3" />
+                {toArabicNum(seconds)} ث قراءة
               </span>
             </div>
 
-            {/* الأسطر الثلاثة بحجم أكبر وأرقام */}
-            <div className="space-y-5 mb-8 relative">
-              {[article.line1, article.line2, article.line3].map((line, i) => (
-                <div key={i} className="relative pr-12">
-                  <div
-                    className="absolute right-0 top-0 w-9 h-9 rounded-full bg-[var(--accent-light)] text-[var(--accent)] flex items-center justify-center font-black text-base"
-                    aria-hidden
-                  >
-                    {['١', '٢', '٣'][i]}
-                  </div>
-                  <p
-                    className={`text-lg md:text-xl leading-loose ${
-                      i === 0
-                        ? 'font-black text-[var(--ink)]'
-                        : i === 1
-                          ? 'font-medium text-[var(--ink-soft)]'
-                          : 'font-bold text-[var(--accent)] italic'
-                    }`}
-                  >
-                    {line}
-                  </p>
-                </div>
-              ))}
-            </div>
+            {/* الأسطر الثلاثة بإيقاع تحريري + كشف تتابعي */}
+            <ThreeLines line1={article.line1} line2={article.line2} line3={article.line3} />
 
             {/* AI Deepen — بشكل مدمج وأنيق */}
             <DeepenInline articleId={article.id} initialContent={article.expandedContent || null} />
@@ -163,7 +156,7 @@ export default async function ArticlePage({ params }: Props) {
                     className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full bg-[var(--accent-light)] text-[var(--accent)]"
                     title={trust.label}
                   >
-                    <span>{trust.icon}</span>
+                    <span aria-hidden>{trust.icon}</span>
                     <span>{trust.label}</span>
                   </span>
                 )}

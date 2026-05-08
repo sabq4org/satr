@@ -2,13 +2,28 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Bookmark, Share2, Sparkles, Heart, ArrowLeft } from 'lucide-react';
+import { Bookmark, Share2, Sparkles, Heart, ArrowLeft, Clock3 } from 'lucide-react';
 import type { Article } from '@/lib/db/schema';
-import { CATEGORY_LABELS, SOURCE_TRUST_LABELS, arabicTimeAgo, cn } from '@/lib/utils';
+import {
+  CATEGORY_LABELS,
+  SOURCE_TRUST_LABELS,
+  arabicTimeAgo,
+  cn,
+  readTime,
+  toArabicNum,
+} from '@/lib/utils';
 
 interface Props {
   article: Article;
   variant?: 'default' | 'featured' | 'compact';
+}
+
+// خبر "جديد" إذا < ساعتين
+function isFresh(article: Article): boolean {
+  const d = article.publishedAt || article.createdAt;
+  if (!d) return false;
+  const date = typeof d === 'string' ? new Date(d) : d;
+  return Date.now() - date.getTime() < 2 * 60 * 60 * 1000;
 }
 
 export default function ArticleCard({ article, variant = 'default' }: Props) {
@@ -51,14 +66,24 @@ export default function ArticleCard({ article, variant = 'default' }: Props) {
 
   const trust = article.sourceTrust ? SOURCE_TRUST_LABELS[article.sourceTrust] : null;
   const articleUrl = `/article/${article.id}`;
+  const seconds = readTime(article.line1, article.line2, article.line3);
+  const fresh = isFresh(article);
 
   return (
     <article
       className={cn(
         'satr-card overflow-hidden group relative',
+        fresh && 'satr-card-fresh',
         variant === 'featured' && 'lg:col-span-2',
       )}
     >
+      {/* شريط لون القسم على اليمين كتوقيع تحريري */}
+      <span
+        aria-hidden
+        className="absolute right-0 top-0 bottom-0 w-[3px] opacity-70 group-hover:opacity-100 transition-opacity"
+        style={{ background: `var(--${article.category})` }}
+      />
+
       {/* الرابط الرئيسي يغطي البطاقة (إلا الأزرار) */}
       <Link
         href={articleUrl}
@@ -80,9 +105,12 @@ export default function ArticleCard({ article, variant = 'default' }: Props) {
           <img
             src={article.imageUrl}
             alt={article.imageAlt || article.line1}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
             loading="lazy"
           />
+          {/* تدرج خفيف يدعم القراءة */}
+          <span aria-hidden className="absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-black/30 to-transparent" />
+
           {article.isBreaking && (
             <div className="absolute top-3 right-3">
               <span className="breaking-badge">عاجل</span>
@@ -92,8 +120,8 @@ export default function ArticleCard({ article, variant = 'default' }: Props) {
       )}
 
       <div className="p-5 relative">
-        {/* السطر العلوي: التصنيف + الوقت */}
-        <div className="flex items-center justify-between mb-4 text-xs">
+        {/* السطر العلوي: التصنيف + الوقت + وقت القراءة */}
+        <div className="flex items-center justify-between mb-4 text-xs gap-2 flex-wrap">
           <div className="flex items-center gap-2">
             <span className={`cat-badge cat-${article.category}`}>
               {CATEGORY_LABELS[article.category]}
@@ -101,6 +129,10 @@ export default function ArticleCard({ article, variant = 'default' }: Props) {
             {article.isBreaking && !article.imageUrl && (
               <span className="breaking-badge">عاجل</span>
             )}
+            <span className="read-time" title="وقت القراءة التقريبي">
+              <Clock3 className="w-3 h-3" />
+              {toArabicNum(seconds)} ث
+            </span>
           </div>
           <span className="text-[var(--ink-faint)]">
             {arabicTimeAgo(article.publishedAt || article.createdAt)}
@@ -118,7 +150,7 @@ export default function ArticleCard({ article, variant = 'default' }: Props) {
         {showDeepen && (
           <div
             onClick={stop}
-            className="relative z-20 mb-4 p-4 bg-[var(--accent-light)]/40 rounded-xl border border-[var(--accent-light)] animate-in fade-in slide-in-from-top-2"
+            className="relative z-20 mb-4 p-4 bg-[var(--accent-light)]/40 rounded-xl border border-[var(--accent-light)] fade-in-up"
           >
             {deepening ? (
               <div className="flex items-center gap-2 text-sm text-[var(--accent)]">
@@ -187,6 +219,7 @@ export default function ArticleCard({ article, variant = 'default' }: Props) {
                 liked && 'text-red-500',
               )}
               aria-label="إعجاب"
+              aria-pressed={liked}
             >
               <Heart className={cn('w-4 h-4', liked && 'fill-current')} />
             </button>
@@ -200,6 +233,7 @@ export default function ArticleCard({ article, variant = 'default' }: Props) {
                 saved && 'text-[var(--accent)]',
               )}
               aria-label="حفظ"
+              aria-pressed={saved}
             >
               <Bookmark className={cn('w-4 h-4', saved && 'fill-current')} />
             </button>
