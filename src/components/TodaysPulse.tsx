@@ -121,16 +121,11 @@ export default function TodaysPulse({ articles, breakingCount }: Props) {
                 <Link
                   key={cat}
                   href={`/category/${cat}`}
-                  className="group inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11.5px] font-bold transition-all hover:-translate-y-0.5"
-                  style={{
-                    background: `var(--${cat})`,
-                    color: 'white',
-                    opacity: 0.92,
-                  }}
+                  className="group inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11.5px] font-bold bg-[var(--paper)] border border-[var(--border-soft)] text-[var(--ink-soft)] hover:border-[var(--accent-light)] hover:text-[var(--accent)] hover:bg-[var(--accent-wash)] transition-all"
                 >
-                  <span aria-hidden className="text-[10px]">{CATEGORY_EMOJI[cat]}</span>
+                  <span aria-hidden className="text-[10px] opacity-80">{CATEGORY_EMOJI[cat]}</span>
                   <span>{CATEGORY_LABELS[cat]}</span>
-                  <span className="opacity-75 tnum text-[10px]">{toArabicNum(count)}</span>
+                  <span className="opacity-60 tnum text-[10px]">{toArabicNum(count)}</span>
                 </Link>
               ))}
             </div>

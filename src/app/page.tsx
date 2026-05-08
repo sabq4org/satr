@@ -87,24 +87,6 @@ export default async function HomePage() {
             {/* عناوين سريعة - "اقرأ نبضة اليوم في ٣٠ ثانية" */}
             <HeadlineTicker articles={latest} />
 
-            {/* الأكثر قراءة — رقيق */}
-            {trending.some((a) => (a.views || 0) > 0) && (
-              <>
-                <section className="section-divider">
-                  <h2 className="flex items-center gap-2">
-                    <Flame className="w-4 h-4 text-[var(--breaking)]" />
-                    الأكثر قراءة
-                  </h2>
-                </section>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-12">
-                  {trending.map((article, i) => (
-                    <RankedCard key={article.id} article={article} rank={i + 1} />
-                  ))}
-                </div>
-              </>
-            )}
-
             {/* تتابع الأخبار - مع زر تبديل بين البطاقات والقائمة */}
             <section className="section-divider">
               <h2 className="flex items-center gap-2">
@@ -114,6 +96,24 @@ export default async function HomePage() {
             </section>
 
             <NewsFeed articles={latestFiltered} />
+
+            {/* الأكثر قراءة — أسفل الصفحة */}
+            {trending.some((a) => (a.views || 0) > 0) && (
+              <>
+                <section className="section-divider mt-10">
+                  <h2 className="flex items-center gap-2">
+                    <Flame className="w-4 h-4 text-[var(--breaking)]" />
+                    الأكثر قراءة
+                  </h2>
+                </section>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                  {trending.map((article, i) => (
+                    <RankedCard key={article.id} article={article} rank={i + 1} />
+                  ))}
+                </div>
+              </>
+            )}
           </>
         ) : (
           <EmptyState
