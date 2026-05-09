@@ -56,56 +56,61 @@ export default function TodaysPulse({ articles, breakingCount }: Props) {
       style={{ background: 'rgba(139,26,43,0.06)' }}
     >
 
-      <div className="relative p-5 md:p-7">
-        {/* تحية + تاريخ */}
-        <div className="flex items-center flex-wrap gap-x-2 gap-y-1 mb-3">
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[var(--paper)] border border-[var(--border-soft)] text-[10.5px] font-bold tracking-[0.18em] uppercase text-[var(--accent)]">
-            <span aria-hidden>{greeting.emoji}</span>
-            <span>{greeting.greeting}</span>
-          </span>
-          <span className="text-[11px] font-semibold tracking-widest text-[var(--ink-soft)] tnum">
+      <div className="relative p-4 md:p-7">
+        {/* تحية + تاريخ + عنوان — صف واحد على الموبايل */}
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[var(--paper)] border border-[var(--border-soft)] text-[10px] font-bold text-[var(--accent)]">
+              <span aria-hidden>{greeting.emoji}</span>
+              <span className="hidden sm:inline">{greeting.greeting}</span>
+            </span>
+            <h1 className="headline-display text-[1.35rem] md:text-[2.5rem] text-[var(--ink)] leading-tight">
+              الموجز اليومي
+            </h1>
+          </div>
+          <span className="text-[10px] font-semibold text-[var(--ink-faint)] tnum hidden sm:block">
             {today}
           </span>
         </div>
 
-        {/* العنوان مع لمعة */}
-        <h1 className="headline-display text-[2rem] md:text-[2.5rem] text-[var(--ink)] mb-4 leading-[1.05]">
-          الموجز اليومي
-        </h1>
-
-        {/* أرقام ضخمة في صف */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5">
+        {/* أرقام — 4 في صف واحد على الموبايل */}
+        <div className="grid grid-cols-4 gap-2 mb-3 md:gap-3 md:mb-5">
           <StatBadge
-            icon={<Newspaper className="w-3.5 h-3.5" />}
+            icon={<Newspaper className="w-3 h-3 md:w-3.5 md:h-3.5" />}
             value={toArabicNum(total)}
             label={total === 1 ? 'خبر' : 'خبراً'}
             tone="accent"
           />
           <StatBadge
-            icon={<Clock3 className="w-3.5 h-3.5" />}
+            icon={<Clock3 className="w-3 h-3 md:w-3.5 md:h-3.5" />}
             value={totalTime}
-            label="زمن القراءة"
+            label="قراءة"
             tone="ink"
           />
           <StatBadge
-            icon={<Zap className="w-3.5 h-3.5 fill-current" />}
+            icon={<Zap className="w-3 h-3 md:w-3.5 md:h-3.5 fill-current" />}
             value={toArabicNum(breakingCount)}
-            label={breakingCount === 1 ? 'عاجل' : 'عاجل'}
+            label="عاجل"
             tone="breaking"
             href={breakingCount > 0 ? '#latest' : undefined}
           />
           <StatBadge
-            icon={<Hash className="w-3.5 h-3.5" />}
+            icon={<Hash className="w-3 h-3 md:w-3.5 md:h-3.5" />}
             value={wordOfDay ? `#${wordOfDay}` : '—'}
-            label={wordOfDay ? `${toArabicNum(wordOfDayCount)} ربط` : 'كلمة اليوم'}
+            label="ترند"
             tone="gold"
             href={wordOfDay ? `/tag/${encodeURIComponent(wordOfDay)}` : undefined}
             small
           />
         </div>
 
-        {/* شريط مواضيع رائجة + زر الكومة */}
-        <div className="flex items-center justify-between gap-3 flex-wrap">
+        {/* زر الكومة على الموبايل فقط */}
+        <div className="md:hidden mb-1">
+          <StackButton />
+        </div>
+
+        {/* شريط مواضيع رائجة + زر الكومة — على الشاشات الكبيرة */}
+        <div className="hidden md:flex items-center justify-between gap-3 flex-wrap">
           <div className="flex items-center gap-2 flex-wrap min-w-0">
             <span className="text-[10px] font-bold tracking-[0.18em] uppercase text-[var(--ink-faint)]">
               رائج
@@ -154,17 +159,17 @@ function StatBadge({
   };
 
   const content = (
-    <div className="paper-card px-3.5 py-2.5 flex items-center gap-2.5 group hover:border-[var(--accent-light)] transition-colors">
-      <span className={`flex-shrink-0 ${toneClasses[tone]} opacity-70 group-hover:opacity-100 transition-opacity`}>
+    <div className="paper-card px-2 py-2 md:px-3.5 md:py-2.5 flex flex-col md:flex-row items-center md:items-center gap-1 md:gap-2.5 group hover:border-[var(--accent-light)] transition-colors text-center md:text-right">
+      <span className={`flex-shrink-0 ${toneClasses[tone]} opacity-70 group-hover:opacity-100 transition-opacity hidden md:block`}>
         {icon}
       </span>
       <div className="flex-1 min-w-0">
         <div
-          className={`font-black ${toneClasses[tone]} tnum leading-tight tracking-tight truncate ${small ? 'text-[15px]' : 'text-xl md:text-[1.5rem]'}`}
+          className={`font-black ${toneClasses[tone]} tnum leading-tight tracking-tight truncate ${small ? 'text-[13px] md:text-[15px]' : 'text-lg md:text-[1.5rem]'}`}
         >
           {value}
         </div>
-        <div className="text-[10px] font-bold tracking-wider uppercase text-[var(--ink-faint)] truncate">
+        <div className="text-[9px] md:text-[10px] font-bold tracking-wider uppercase text-[var(--ink-faint)] truncate">
           {label}
         </div>
       </div>
