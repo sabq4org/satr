@@ -15,10 +15,10 @@ export default async function Header({ active = 'home' }: Props) {
   const authed = await isAuthenticated();
 
   return (
-    <header className="sticky top-0 z-50 glass border-b border-[var(--border-soft)]">
+    <header className="sticky top-0 z-50 bg-[var(--accent)] shadow-lg">
       <div className="max-w-7xl mx-auto px-4 lg:px-6">
         <div className="flex items-center justify-between h-[60px]">
-          <Logo size="md" />
+          <Logo size="md" light={true} />
 
           <div className="flex items-center gap-1">
             <HeaderSearch />
@@ -27,14 +27,14 @@ export default async function Header({ active = 'home' }: Props) {
               <div className="flex items-center gap-1">
                 <Link
                   href="/admin"
-                  className="hidden md:inline-flex items-center gap-2 px-3.5 py-1.5 bg-[var(--accent)] text-white rounded-full text-[12.5px] font-semibold hover:bg-[var(--accent-deep)] transition-colors"
+                  className="hidden md:inline-flex items-center gap-2 px-3.5 py-1.5 bg-white/20 hover:bg-white/30 text-white rounded-full text-[12.5px] font-semibold transition-colors"
                 >
                   <User className="w-3.5 h-3.5" />
                   لوحة التحرير
                 </Link>
                 <Link
                   href="/admin"
-                  className="md:hidden p-2 bg-[var(--accent)] text-white rounded-full hover:bg-[var(--accent-deep)] transition-colors"
+                  className="md:hidden p-2 bg-white/20 hover:bg-white/30 text-white rounded-full transition-colors"
                   aria-label="لوحة التحرير"
                 >
                   <User className="w-3.5 h-3.5" />
@@ -44,7 +44,7 @@ export default async function Header({ active = 'home' }: Props) {
             ) : (
               <Link
                 href="/admin/login"
-                className="hidden md:inline-flex items-center gap-1.5 px-3.5 py-1.5 border border-[var(--border)] rounded-full text-[12.5px] font-semibold text-[var(--ink-soft)] hover:border-[var(--accent)] hover:text-[var(--accent)] transition-colors"
+                className="hidden md:inline-flex items-center gap-1.5 px-3.5 py-1.5 border border-white/40 rounded-full text-[12.5px] font-semibold text-white/80 hover:bg-white/20 hover:text-white transition-colors"
               >
                 <User className="w-3.5 h-3.5" />
                 دخول المحررين
@@ -90,8 +90,8 @@ function NavLink({
       aria-current={active ? 'page' : undefined}
       className={
         active
-          ? 'px-3.5 py-1.5 rounded-full text-[13px] font-bold text-[var(--accent)] bg-[var(--accent-wash)] whitespace-nowrap'
-          : 'px-3.5 py-1.5 rounded-full text-[13px] font-medium text-[var(--ink-soft)] hover:bg-[var(--accent-wash)] hover:text-[var(--accent)] whitespace-nowrap transition-colors'
+          ? 'px-3.5 py-1.5 rounded-full text-[13px] font-bold text-[var(--accent)] bg-white whitespace-nowrap'
+          : 'px-3.5 py-1.5 rounded-full text-[13px] font-medium text-white/75 hover:bg-white/20 hover:text-white whitespace-nowrap transition-colors'
       }
     >
       {children}

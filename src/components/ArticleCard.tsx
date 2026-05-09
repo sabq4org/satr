@@ -76,12 +76,7 @@ export default function ArticleCard({ article, variant = 'default' }: Props) {
         variant === 'featured' && 'lg:col-span-2',
       )}
     >
-      {/* شريط لون القسم على اليمين — خط حريري رفيع */}
-      <span
-        aria-hidden
-        className="absolute right-0 top-4 bottom-4 w-[2px] rounded-full opacity-50 group-hover:opacity-90 transition-opacity"
-        style={{ background: `var(--${article.category})` }}
-      />
+
 
       <Link
         href={articleUrl}

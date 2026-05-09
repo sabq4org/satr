@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
 
 const LINE_LABELS = ['الحدث', 'السياق', 'المعنى'] as const;
-const LINE_NUMBERS = ['١', '٢', '٣'] as const;
+const LINE_NUMBERS = ['1', '2', '3'] as const;
 
 interface Props {
   line1: string;

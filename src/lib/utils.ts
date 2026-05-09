@@ -43,10 +43,9 @@ export function arabicTimeAgo(date: Date | string | null): string {
   return d.toLocaleDateString('ar-SA');
 }
 
-// تحويل الأرقام إلى عربية شرقية (١٢٣)
-const ARABIC_DIGITS = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'] as const;
+// الأرقام بالصيغة الغربية (123) — قرار تصميمي
 export function toArabicNum(n: number | string): string {
-  return String(n).replace(/\d/g, (d) => ARABIC_DIGITS[Number(d)]);
+  return String(n);
 }
 
 // تحية حسب الوقت بالساعة المحلية

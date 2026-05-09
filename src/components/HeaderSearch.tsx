@@ -66,7 +66,7 @@ export default function HeaderSearch() {
     <>
       <button
         onClick={() => setOpen(true)}
-        className="hidden md:inline-flex items-center gap-2 pr-3 pl-2 py-2 rounded-full text-sm text-[var(--ink-soft)] border border-[var(--border)] hover:border-[var(--accent)] hover:text-[var(--accent)] transition-colors"
+        className="hidden md:inline-flex items-center gap-2 pr-3 pl-2 py-2 rounded-full text-sm text-white/70 border border-white/30 hover:bg-white/20 hover:text-white transition-colors"
         aria-label="بحث"
       >
         <Search className="w-4 h-4" />
@@ -78,7 +78,7 @@ export default function HeaderSearch() {
 
       <button
         onClick={() => setOpen(true)}
-        className="md:hidden p-2.5 rounded-full text-[var(--ink-soft)] hover:bg-[var(--accent-light)] hover:text-[var(--accent)] transition-colors"
+        className="md:hidden p-2.5 rounded-full text-white/80 hover:bg-white/20 hover:text-white transition-colors"
         aria-label="بحث"
       >
         <Search className="w-4 h-4" />
@@ -164,7 +164,7 @@ export default function HeaderSearch() {
                 <kbd className="px-1.5 py-0.5 rounded border border-[var(--border)] bg-[var(--paper)] font-mono">esc</kbd>
                 للإغلاق
               </span>
-              <span>كل خبر في ٣ سطور.</span>
+              <span>كل خبر في 3 سطور.</span>
             </div>
           </div>
         </div>

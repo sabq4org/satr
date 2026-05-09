@@ -52,11 +52,9 @@ export default function TodaysPulse({ articles, breakingCount }: Props) {
   return (
     <section
       aria-label="نبض اليوم"
-      className="relative mb-7 overflow-hidden rounded-3xl bg-gradient-to-bl from-[var(--accent-tint)] via-[var(--paper)] to-[var(--paper)] border border-[var(--border)]"
+      className="relative mb-7 overflow-hidden rounded-2xl border border-[var(--accent-light)]"
+      style={{ background: 'rgba(139,26,43,0.06)' }}
     >
-      {/* زخرفة هندسية متحركة في الخلفية */}
-      <div aria-hidden className="ambient-blob absolute -top-12 -left-12 w-56 h-56 rounded-full bg-[var(--accent-light)] opacity-30 blur-3xl pointer-events-none" />
-      <div aria-hidden className="ambient-blob absolute top-1/2 right-0 w-40 h-40 rounded-full bg-[var(--gold-soft)] opacity-25 blur-3xl pointer-events-none" style={{ animationDelay: '7s' }} />
 
       <div className="relative p-5 md:p-7">
         {/* تحية + تاريخ */}
@@ -72,11 +70,7 @@ export default function TodaysPulse({ articles, breakingCount }: Props) {
 
         {/* العنوان مع لمعة */}
         <h1 className="headline-display text-[2rem] md:text-[2.5rem] text-[var(--ink)] mb-4 leading-[1.05]">
-          الموجز{' '}
-          <span className="relative inline-block">
-            <span className="relative z-10">اليومي</span>
-            <span aria-hidden className="absolute inset-x-0 bottom-1.5 h-2.5 md:h-3 bg-[var(--gold-soft)] -z-0 rounded opacity-60" />
-          </span>
+          الموجز اليومي
         </h1>
 
         {/* أرقام ضخمة في صف */}

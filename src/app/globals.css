@@ -1,45 +1,51 @@
 @import "tailwindcss";
 
 :root {
-  /* خلفيات — كريم أعمق وأكثر دفئاً */
-  --bg: #fbf9f4;
-  --bg-tinted: #f5f1e8;
+  /* خلفيات — كريم دافئ (Warm Editorial) */
+  --bg: #F7F3EE;
+  --bg-tinted: #F0EAE1;
   --paper: #ffffff;
-  --paper-tinted: #fdfbf6;
+  --paper-tinted: #FDFAF7;
 
-  /* الأزرق الليلي — أكثر تشبعاً وعمقاً */
-  --accent: #1a3a5e;
-  --accent-deep: #0d2440;
-  --accent-soft: #5a7896;
-  --accent-light: #dde6f0;
-  --accent-tint: #eef3f8;
-  --accent-wash: #f5f8fc;
+  /* البورغندي الصحفي — عميق وأنيق */
+  --accent: #8B1A2B;
+  --accent-deep: #6B1020;
+  --accent-soft: #B03A4A;
+  --accent-light: #F2D5D8;
+  --accent-tint: #F9ECED;
+  --accent-wash: #FDF6F6;
 
-  /* الحبر — تباين أكثر هدوءاً */
-  --ink: #1f1d1a;
-  --ink-soft: #6b6660;
-  --ink-faint: #b0a89e;
-  --ink-whisper: #d8d2c6;
+  /* لون ثانوي دافئ — عنبري خفيف */
+  --warm: #8B5E3C;
+  --warm-soft: #C49A6C;
+  --warm-light: #F0E4D4;
+  --warm-wash: #FAF4EC;
 
-  /* خاص بالأقسام (هادئة منعّمة) */
-  --breaking: #b8253a;
-  --breaking-soft: #d05568;
-  --economy: #2e7d32;
-  --sport: #f57c00;
-  --tech: #1565c0;
-  --culture: #7b1fa2;
-  --world: #455a64;
-  --local: #1a3a5e;
-  --misc: #5d4037;
+  /* الحبر — دافئ وواضح */
+  --ink: #1A1A1A;
+  --ink-soft: #6B6560;
+  --ink-faint: #B0A8A0;
+  --ink-whisper: #D8D0C6;
+
+  /* خاص بالأقسام */
+  --breaking: #C0392B;
+  --breaking-soft: #E74C3C;
+  --economy: #1E6B2E;
+  --sport: #D4770A;
+  --tech: #1A5276;
+  --culture: #6C3483;
+  --world: #2E4057;
+  --local: #8B4513;
+  --misc: #5D4037;
 
   /* لمسات ذهبية للحظات احتفالية */
-  --gold: #b8893a;
-  --gold-soft: #e9d8a6;
+  --gold: #B8893A;
+  --gold-soft: #E9D8A6;
 
-  /* حدود وظلال — نعومة عالية */
-  --border: #ece7da;
-  --border-soft: #f3eee2;
-  --border-strong: #d6cdbe;
+  /* حدود وظلال — دافئة وناعمة */
+  --border: #E8E0D5;
+  --border-soft: #F0EAE1;
+  --border-strong: #D0C4B5;
 
   /* ظلال شعرية - للنعومة */
   --shadow-whisper: 0 1px 2px rgba(31, 29, 26, 0.03);
@@ -75,6 +81,10 @@
   --color-local: var(--local);
   --color-misc: var(--misc);
   --color-gold: var(--gold);
+  --color-warm: var(--warm);
+  --color-warm-soft: var(--warm-soft);
+  --color-warm-light: var(--warm-light);
+  --color-warm-wash: var(--warm-wash);
 }
 
 * {
@@ -129,18 +139,18 @@ body::after {
 /* ====================================================== */
 .satr-card {
   background: var(--paper);
-  border: 1px solid var(--border-soft);
-  border-radius: 14px;
-  box-shadow: var(--shadow-whisper);
-  transition: transform 0.4s cubic-bezier(0.2, 0, 0, 1),
-              box-shadow 0.4s cubic-bezier(0.2, 0, 0, 1),
-              border-color 0.3s ease;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.03);
+  transition: transform 0.35s cubic-bezier(0.2, 0, 0, 1),
+              box-shadow 0.35s cubic-bezier(0.2, 0, 0, 1),
+              border-color 0.25s ease;
 }
 
 .satr-card:hover {
-  box-shadow: var(--shadow-lifted);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.08), 0 2px 6px rgba(0,0,0,0.05);
   transform: translateY(-3px);
-  border-color: var(--accent-light);
+  border-color: var(--border-strong);
 }
 
 /* بطاقة "ورقة" — للحظات أكثر هدوءاً */
@@ -261,13 +271,13 @@ body::after {
   letter-spacing: 0.02em;
 }
 
-.cat-local { background: rgba(26,58,94,0.08); color: var(--local); }
-.cat-world { background: rgba(69,90,100,0.08); color: var(--world); }
-.cat-economy { background: rgba(46,125,50,0.08); color: var(--economy); }
-.cat-sport { background: rgba(245,124,0,0.08); color: var(--sport); }
-.cat-tech { background: rgba(21,101,192,0.08); color: var(--tech); }
-.cat-culture { background: rgba(123,31,162,0.08); color: var(--culture); }
-.cat-misc { background: rgba(93,64,55,0.08); color: var(--misc); }
+.cat-local { background: rgba(139,69,19,0.10); color: var(--local); border: 1px solid rgba(139,69,19,0.18); }
+.cat-world { background: rgba(46,64,87,0.10); color: var(--world); border: 1px solid rgba(46,64,87,0.18); }
+.cat-economy { background: rgba(30,107,46,0.10); color: var(--economy); border: 1px solid rgba(30,107,46,0.18); }
+.cat-sport { background: rgba(212,119,10,0.10); color: var(--sport); border: 1px solid rgba(212,119,10,0.18); }
+.cat-tech { background: rgba(26,82,118,0.10); color: var(--tech); border: 1px solid rgba(26,82,118,0.18); }
+.cat-culture { background: rgba(108,52,131,0.10); color: var(--culture); border: 1px solid rgba(108,52,131,0.18); }
+.cat-misc { background: rgba(93,64,55,0.10); color: var(--misc); border: 1px solid rgba(93,64,55,0.18); }
 
 /* ====================================================== */
 /* الوسوم — هادئة                                          */
