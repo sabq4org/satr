@@ -5,6 +5,7 @@ import { CATEGORY_LABELS } from '@/lib/utils';
 import { isAuthenticated } from '@/lib/auth';
 import LogoutButton from './LogoutButton';
 import HeaderSearch from './HeaderSearch';
+import HeaderScrollWrapper from './HeaderScrollWrapper';
 import type { Category } from '@/lib/db/schema';
 
 interface Props {
@@ -15,7 +16,8 @@ export default async function Header({ active = 'home' }: Props) {
   const authed = await isAuthenticated();
 
   return (
-    <header className="sticky top-0 z-50 bg-[var(--accent)] shadow-lg">
+    <HeaderScrollWrapper>
+    <header className="bg-[var(--accent)]">
       <div className="max-w-7xl mx-auto px-4 lg:px-6">
         <div className="flex items-center justify-between h-[60px]">
           <Logo size="md" light={true} />
@@ -72,6 +74,7 @@ export default async function Header({ active = 'home' }: Props) {
         </nav>
       </div>
     </header>
+    </HeaderScrollWrapper>
   );
 }
 

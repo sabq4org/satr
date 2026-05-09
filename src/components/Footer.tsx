@@ -15,21 +15,17 @@ export default function Footer() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="mt-20 border-t border-[var(--border-soft)] bg-[var(--bg-tinted)]">
-      <div className="max-w-7xl mx-auto px-4 lg:px-6 py-12">
-        {/* شعار "قاعدة الـ٣" — هادئ */}
-        <div className="text-center mb-10">
+    <footer className="mt-12 md:mt-20 border-t border-[var(--border-soft)] bg-[var(--bg-tinted)]">
+      <div className="max-w-7xl mx-auto px-4 lg:px-6 py-6 md:py-12">
+        {/* شعار "قاعدة الـ٣" — مخفي على الموبايل */}
+        <div className="hidden md:block text-center mb-10">
           <p className="text-[10.5px] font-bold tracking-[0.3em] text-[var(--accent)] uppercase mb-2 opacity-80">
             قاعدتنا الذهبية
           </p>
           <p className="text-xl md:text-2xl font-black text-[var(--ink)] mb-1 tracking-tight">
             كل خبر في{' '}
             <span className="relative inline-block">
-              <span className="relative z-10">٣ سطور</span>
-              <span
-                aria-hidden
-                className="absolute inset-x-0 bottom-1 h-2 bg-[var(--gold-soft)] -z-0 rounded opacity-60"
-              />
+              <span className="relative z-10">3 سطور</span>
             </span>
             . لا أكثر.
           </p>
@@ -38,10 +34,10 @@ export default function Footer() {
           </p>
         </div>
 
-        {/* الأعمدة */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-10">
+        {/* الأعمدة — مضغوطة على الموبايل */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8 mb-6 md:mb-10">
           <div className="col-span-2 md:col-span-1">
-            <p className="font-black text-[var(--accent)] text-xl mb-1.5 flex items-baseline gap-1.5">
+            <p className="font-black text-[var(--accent)] text-lg md:text-xl mb-1.5 flex items-baseline gap-1.5">
               سطر
               <span aria-hidden className="flex items-baseline gap-1">
                 <span className="w-1 h-1 rounded-full bg-[var(--accent)]" />
@@ -97,7 +93,7 @@ export default function Footer() {
         </div>
 
         {/* الفاصل */}
-        <div className="flex items-center justify-center gap-1.5 mb-5 text-[var(--accent)]/25">
+        <div className="hidden md:flex items-center justify-center gap-1.5 mb-5 text-[var(--accent)]/25">
           <span className="w-1.5 h-1.5 rounded-full bg-current" />
           <span className="w-1 h-1 rounded-full bg-current opacity-60" />
           <span className="w-0.5 h-0.5 rounded-full bg-current opacity-30" />
